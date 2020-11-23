@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tekra_app/src/screens/components/message_context_text.dart';
-import 'package:tekra_app/src/screens/components/rounded_button.dart';
-import 'package:tekra_app/src/screens/components/rounded_input_field.dart';
 import 'package:tekra_app/src/mixins/validation.dart';
 
 // ignore: must_be_immutable
@@ -47,7 +45,7 @@ class TwoStepVerification extends StatelessWidget with ValidationMixins{
                       child: Text(
                         "Verificación de dos pasos",
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 20,
                           color: Color(0xff051228),
                           fontWeight: FontWeight.bold,
                         ),
@@ -59,7 +57,7 @@ class TwoStepVerification extends StatelessWidget with ValidationMixins{
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        "Para seguridad de tus datos realizamos una verificación de dos pasos.",
+                        "Por tu seguridad se está efectuando la validación de cuenta en dos pasos, espera a que se te autorice el acceso a tu cuenta, esto no tomará más de unos minutos.",
                         style: TextStyle(
                           fontSize: 12,
                           color: Color(0xff051228),
@@ -71,50 +69,21 @@ class TwoStepVerification extends StatelessWidget with ValidationMixins{
                     SizedBox(
                       height: 20,
                     ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Recibirás un código en tu correo ********am@tekra.com.gt",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xff051228),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
                   ],
                 ),
               ),
               SizedBox(
                 height: 20,
               ),
-              RoundedInputField(
-                text: "Código",
-                onChanged: (value){
-                },
-                validator: validateCode,
-                controller: codeController,
-              ),
               Spacer(),
               MessageContextText(
-                text: "¿No resiviste el código?",
-                textaction: "Reenviar código",
+                text: "¿No has logrado entrar a tu cuenta?",
+                textaction: "Solicitar acceso de nuevo",
                 size: size,
                 ontap: (){},
               ),
               SizedBox(
                 height: 20,
-              ),
-              RoudedButton(
-                text: "CONTINUAR",
-                press: (){
-                  if(formKey.currentState.validate()){
-                    print(codeController.value);
-                    Navigator.pushReplacementNamed(context, "/home");
-                  }
-                },
-                color: Color(0xff26b5e6),
-                textColor: Colors.white,
               ),
               SizedBox(
                 height: 20,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tekra_app/src/provider/notifications.dart';
 
 class SplashScreen extends StatefulWidget{
   @override
@@ -9,10 +11,25 @@ class _SplashScreen extends State<SplashScreen>{
   @override
   // ignore: must_call_super
   void initState() {
-    Future.delayed(
+    super.initState();
+    PushNotificationProvider pushNotificationProvider = new PushNotificationProvider();
+    pushNotificationProvider.initNotifications();
+    checkLoginStatus();
+  }
+
+  checkLoginStatus() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.getString("key") == null){
+      Future.delayed(
         Duration(milliseconds: 2000),
-          () => Navigator.pushReplacementNamed(context, "/login"),
-    );
+          () => Navigator.pushReplacementNamed(context, "/home"),
+      );
+    }else{
+       Future.delayed(
+        Duration(milliseconds: 2000),
+          () => Navigator.pushReplacementNamed(context, "/home"),
+      );
+    }
   }
 
   @override
