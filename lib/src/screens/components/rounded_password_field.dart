@@ -89,7 +89,7 @@ class RoundedPasswordField extends StatelessWidget {
           },
         ):    
         SizedBox(
-          height: 20,
+          height: 0,
         ),       
       ]
     );

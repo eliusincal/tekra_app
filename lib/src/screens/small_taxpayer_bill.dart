@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tekra_app/src/global/global.dart';
 import 'package:tekra_app/src/screens/components/rounded_date_input.dart';
 import 'package:tekra_app/src/screens/components/rounded_input_field.dart';
 
@@ -13,12 +15,34 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
   final establecientoSeleccionado = TextEditingController();
   String _friendsVal;
 
+  String invoiceTitle = "Factura a emitir";
+  String finished = "No";
+  String transmitter = "Emisor";
+  String contractNumber = "No. Contrato";
+  String startDate = "0000-00-00";
+  String endDate="0000-00-00";
+
   List _friendsName = [
     "Establecimiento 1",
     "Establecimiento 2",
     "Establecimiento 3",
     "Establecimiento 4"
   ];
+
+  List _coindsList = [
+    "QT - Quetzal",
+    "US - Dolares",
+    "EU - Euros"
+  ];
+
+  @override
+  initState() {
+    super.initState();
+    print("Entro esta opcion");
+    GlobalFunctions().isAcces(context);
+    loadData();
+  }
+  
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -48,7 +72,7 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Nueva Factura Pequeño Contribuyente",
+                  invoiceTitle,
                   style: TextStyle(
                     color: Color(0xff051228),
                     fontSize: 25,
@@ -69,7 +93,14 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
               SizedBox(
                 height: 20,
               ),
-              CardInfo(size: size),
+              CardInfo(
+                size: size,
+                transmitter: transmitter,
+                endDate: endDate,
+                startDate: startDate,
+                contractNumber: contractNumber,
+                finished: finished,
+              ),
               SizedBox(
                 height: 20,
               ),
@@ -170,7 +201,7 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
                                 _friendsVal = value;
                               });
                             },
-                            items: _friendsName.map((value) {
+                            items: _coindsList.map((value) {
                               return DropdownMenuItem(
                                   value: value, child: Text(value));
                             }).toList(),
@@ -195,15 +226,61 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
       ),
     );
   }
+  loadData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var title = "Factura a emitir";
+    var finish = "No";
+    var transm ="Emisor";
+    var contractNum = "No.";
+    var eDate="0000-00-00";
+    var sDate = "0000-00-00";
+    if(sharedPreferences.get("invoiceTitle") != null){
+      title = sharedPreferences.get("invoiceTitle");
+    }
+    if(sharedPreferences.get("startDateContract") != null){
+      sDate = sharedPreferences.get("startDateContract").toString().substring(0, 10);
+    }
+    if(sharedPreferences.get("endDateContract") != null){
+      eDate = sharedPreferences.get("endDateContract").toString().substring(0, 10);
+    }
+    if(sharedPreferences.get("finishContract") != null){
+      finish = sharedPreferences.get("finishContract");
+    }
+    if(sharedPreferences.get("contract") != null){
+      contractNum = sharedPreferences.get("contract");
+    }
+    print(sharedPreferences.get("clientName"));
+    if(sharedPreferences.get("clientName") != null){
+      transm = sharedPreferences.get("clientName");
+    }
+    setState(() {
+      invoiceTitle = title;
+      startDate = sDate;
+      transmitter = transm;
+      endDate = eDate;
+      contractNumber = contractNum;
+      finished = finish;
+    });
+  }
 }
 
 class CardInfo extends StatelessWidget {
   const CardInfo({
     Key key,
     @required this.size,
+    @required this.transmitter,
+    @required this.contractNumber,
+    @required this.startDate,
+    @required this.endDate,
+    @required this.finished
   }) : super(key: key);
 
   final Size size;
+  final transmitter;
+  final contractNumber;
+  final startDate;
+  final endDate;
+  final finished;
 
   @override
   Widget build(BuildContext context) {
@@ -226,17 +303,17 @@ class CardInfo extends StatelessWidget {
                     "Emisor",
                     style: TextStyle(
                       color: Color(0xffbbbbbb),
-                      fontSize: 20,
+                      fontSize: 18,
                     ),
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Bayer, S.A. [2021100001]",
+                    transmitter,
                     style: TextStyle(
                       color: Color(0xff555555),
-                      fontSize: 25,
+                      fontSize: 20,
                     ),
                   ),
                 ),
@@ -246,7 +323,7 @@ class CardInfo extends StatelessWidget {
                     Text(
                       "Contrato",
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: 18,
                         color: Color(0xff69717e),
                       ),
                     ),
@@ -267,17 +344,17 @@ class CardInfo extends StatelessWidget {
                     "No.",
                     style: TextStyle(
                       color: Color(0xffbbbbbb),
-                      fontSize: 19,
+                      fontSize: 17,
                     ),
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "BAYER0001",
+                    contractNumber,
                     style: TextStyle(
                       color: Color(0xff555555),
-                      fontSize: 20,
+                      fontSize: 19,
                     ),
                   ),
                 ),
@@ -292,14 +369,14 @@ class CardInfo extends StatelessWidget {
                             "Fecha inicio",
                             style: TextStyle(
                               color: Color(0xffbbbbbb),
-                              fontSize: 18,
+                              fontSize: 17,
                             ),
                           ),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "2020-10-05",
+                            startDate,
                             style: TextStyle(
                               color: Color(0xff555555),
                               fontSize: 19,
@@ -316,14 +393,14 @@ class CardInfo extends StatelessWidget {
                             "Fecha Fin",
                             style: TextStyle(
                               color: Color(0xffbbbbbb),
-                              fontSize: 18,
+                              fontSize: 17,
                             ),
                           ),
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "2020-11-05",
+                            endDate,
                             style: TextStyle(
                               color: Color(0xff555555),
                               fontSize: 19,
@@ -347,7 +424,7 @@ class CardInfo extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "No",
+                            finished,
                             style: TextStyle(
                               color: Color(0xff555555),
                               fontSize: 19,

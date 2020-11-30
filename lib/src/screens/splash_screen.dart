@@ -8,6 +8,8 @@ class SplashScreen extends StatefulWidget{
 }
 
 class _SplashScreen extends State<SplashScreen>{
+
+
   @override
   // ignore: must_call_super
   void initState() {
@@ -19,10 +21,10 @@ class _SplashScreen extends State<SplashScreen>{
 
   checkLoginStatus() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences.getString("key") == null){
+    if(sharedPreferences.getString("autorizado") == null){
       Future.delayed(
         Duration(milliseconds: 2000),
-          () => Navigator.pushReplacementNamed(context, "/home"),
+          () => Navigator.pushReplacementNamed(context, "/login"),
       );
     }else{
        Future.delayed(
@@ -43,7 +45,6 @@ class _SplashScreen extends State<SplashScreen>{
             Spacer(),
             Center(
               child: FractionallySizedBox(
-                widthFactor:.6,
                 child: Image.asset(
                   'assets/images/logo/logo2x.png',
                   fit: BoxFit.none,

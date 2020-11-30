@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "793578165630",
-    "firebase_url": "https://tekra-app.firebaseio.com",
-    "project_id": "tekra-app",
-    "storage_bucket": "tekra-app.appspot.com"
+    "project_number": "661366891963",
+    "firebase_url": "https://notificaciones-para-tekra.firebaseio.com",
+    "project_id": "notificaciones-para-tekra",
+    "storage_bucket": "notificaciones-para-tekra.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:793578165630:android:2cef611dfe1b60d5320f2f",
+        "mobilesdk_app_id": "1:661366891963:android:8e51887926d68f5fbf909e",
         "android_client_info": {
           "package_name": "com.example.tekra_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "793578165630-9l98uvt7js1fouej91d6ruh84oljcg12.apps.googleusercontent.com",
+          "client_id": "661366891963-16hg8fag9p6esndldidh655ei880clqg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.tekra_app",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "793578165630-gcjud7vbcl7jtpn758jl8pecmndgshrb.apps.googleusercontent.com",
+          "client_id": "661366891963-ffjdf9iab5sqshpn7a30bktapoa4ev1g.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCXpfl2TBjGrgQIjDcWYbe202kxCID_KtY"
+          "current_key": "AIzaSyDn7u5vxgGf27QUJyGHtggifqOIlhEQTGE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "793578165630-gcjud7vbcl7jtpn758jl8pecmndgshrb.apps.googleusercontent.com",
+              "client_id": "661366891963-ffjdf9iab5sqshpn7a30bktapoa4ev1g.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tekra_app/src/global/global.dart';
 import 'package:tekra_app/src/screens/components/message_context_text.dart';
 import 'package:tekra_app/src/screens/components/rounded_button.dart';
 import 'package:tekra_app/src/screens/components/rounded_input_field.dart';
@@ -12,6 +14,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io' show Platform;
 import 'dart:convert' as convert;
+
+import 'package:tekra_app/src/utils/dialog.dart';
 
 // ignore: must_be_immutable
 class Login extends StatefulWidget{
@@ -24,10 +28,10 @@ class Login extends StatefulWidget{
 
 class _LoginState extends State<Login> with ValidationMixins {
   TextEditingController userController = TextEditingController();
-
   TextEditingController contrasenaController = TextEditingController();
-
   final GlobalKey<FormState> formKey= new GlobalKey<FormState>();
+  GlobalFunctions global = GlobalFunctions();
+
   String mensaje = "";
 
   @override
@@ -90,7 +94,7 @@ class _LoginState extends State<Login> with ValidationMixins {
                 text: "INICIAR SESIÓN",
                 press: (){
                   if(formKey.currentState.validate()){
-                    _login(userController.text, contrasenaController.text);
+                    _login(this.context, userController.text, contrasenaController.text);
                   }
                 },
                 color: Color(0xff26b5e6),
@@ -106,10 +110,13 @@ class _LoginState extends State<Login> with ValidationMixins {
     );
   }
 
-  _login(String user, String pass) async{
+  _login(context, String user, String pass) async{
+    ProgressDialog progressDialog = ProgressDialog(context);
+    progressDialog.show();
     var result = await Connectivity().checkConnectivity();
     if(result == ConnectivityResult.none){
-      _showDialog("Conexión no encontrada", "Actualmente no tienes acceso a Internet.");
+      progressDialog.dismiss();
+      global.showModalDialog("Conexión no encontrada", "Actualmente no tienes acceso a Internet.", context);
     }else{
       String pnClave = "";     
       FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -120,6 +127,7 @@ class _LoginState extends State<Login> with ValidationMixins {
       }else if(Platform.isIOS){
         pnClave = "IOS";
       }
+      Clipboard.setData(ClipboardData(text:token));
       Map data = {
         'parametros':{
           'pn_usuario':user,
@@ -128,8 +136,8 @@ class _LoginState extends State<Login> with ValidationMixins {
           'pn_identificador': token
         }
       };
+      print(token);
       var body = convert.jsonEncode(data);
-      print(body);
       var jsonData;
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       var response = await http.post("http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/administracion/login/usuarios_login", headers: {"Content-Type": "application/json"}, body: body);
@@ -137,58 +145,24 @@ class _LoginState extends State<Login> with ValidationMixins {
         jsonData = json.decode(response.body);
         if(jsonData['resultado'][0]['error'] == 0){
           if(jsonData['datos'][0]['clave_vencida']==1){
-            _showDialogWithNav("Clave vencida", "Tu clave ha expirado, vuelve a solicitar una clave", "/two_step_verification");
+            progressDialog.dismiss();
+            global.showDialogWithNav("Clave vencida", "Tu clave ha expirado, vuelve a solicitar una clave", "/expired_key", context);
           }else{
-            sharedPreferences.setString("key", jsonData['datos'][0]['codigo_autorizacion']);
+            progressDialog.dismiss();
+            sharedPreferences.setString("user", jsonData['datos'][0]['usuario']);
+            sharedPreferences.setString("user_name", jsonData['datos'][0]['nombre_usuario']);
+            sharedPreferences.setString("pass", pass);
             Navigator.pushReplacementNamed(context, "/two_step_verification");
-            //_showDialog("Todo nice", "te salio el login");
           }
         }else{
+          progressDialog.dismiss();
           mensaje = jsonData['resultado'][0]['mensaje'];
         }
       }else if(response.statusCode == 500){
-        _showDialog("Error en el servidor", "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.");
+        progressDialog.dismiss();
+        global.showModalDialog("Error en el servidor", "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.", context);
       }
     }
-  }
-
-  _showDialog(title, text){
-    showDialog(
-      context: context,
-      builder: (context){
-        return AlertDialog(
-          title: Text(title),
-          content: Text(text),
-          actions: [
-            FlatButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              child: Text("Ok")
-            )
-          ],
-        );
-      }
-    );
-  }
-  _showDialogWithNav(title, text, rute){
-    showDialog(
-      context: context,
-      builder: (context){
-        return AlertDialog(
-          title: Text(title),
-          content: Text(text),
-          actions: [
-            FlatButton(
-              onPressed: (){
-                Navigator.pushReplacementNamed(context, rute);
-              },
-              child: Text("Ir")
-            )
-          ],
-        );
-      }
-    );
   }
 }
 

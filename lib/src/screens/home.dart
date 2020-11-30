@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tekra_app/src/global/global.dart';
 import 'package:tekra_app/src/screens/consults.dart';
 import 'package:tekra_app/src/screens/options_user.dart';
 import 'package:tekra_app/src/screens/profile.dart';
@@ -21,6 +22,12 @@ class _HomeState extends State<Home>{
     Profile(),
     Settings(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    GlobalFunctions().isAcces(context);
+  }
 
   @override
   Widget build(BuildContext context){

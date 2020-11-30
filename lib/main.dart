@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tekra_app/src/screens/expired_key.dart';
 import 'package:tekra_app/src/screens/home.dart';
 import 'package:tekra_app/src/screens/login.dart';
 import 'package:tekra_app/src/screens/splash_screen.dart';
@@ -12,6 +13,7 @@ void main() {
       Login.routeName :(BuildContext context) => Login(),
       TwoStepVerification.routeName : (BuildContext context)=> TwoStepVerification(),
       Home.routeName:(BuildContext context)=> Home(),
+      ExpiredKey.routeName:(BuildContext context)=> ExpiredKey(),
     },
   ));
 }

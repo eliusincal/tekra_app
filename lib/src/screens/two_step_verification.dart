@@ -1,18 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:tekra_app/src/provider/notifications.dart';
 import 'package:tekra_app/src/screens/components/message_context_text.dart';
 import 'package:tekra_app/src/mixins/validation.dart';
 
 // ignore: must_be_immutable
-class TwoStepVerification extends StatelessWidget with ValidationMixins{
+class TwoStepVerification extends StatefulWidget with ValidationMixins{
   //Url para poder acceder a esta clase
   static const String routeName = "/two_step_verification";
 
-  //Controladores para el formulario de login
+  @override
+  _TwoStepVerificationState createState() => _TwoStepVerificationState();
+}
+
+class _TwoStepVerificationState extends State<TwoStepVerification> {
+
+  void initState(){
+    super.initState();
+    PushNotificationProvider _pnp = new PushNotificationProvider();
+    _pnp.initNotifications();
+    _pnp.mensajes.listen((data) {
+      print(data);
+      if(data == "123456"){
+        Navigator.pushReplacementNamed(context, "/home");
+      }
+    });
+  }
+
   TextEditingController codeController = TextEditingController();
 
-  //Formulario para poder generar las validaciones
   final GlobalKey<FormState> formKey= new GlobalKey<FormState>();
-  
+
   @override
   Widget build(BuildContext context){
     Size size = MediaQuery.of(context).size;
