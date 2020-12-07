@@ -6,6 +6,7 @@ import 'package:tekra_app/src/models/contrato.dart';
 import 'package:tekra_app/src/models/invoice.dart';
 import 'package:tekra_app/src/screens/components/option_card_user.dart';
 import 'package:http/http.dart' as http;
+import 'package:tekra_app/src/screens/small_taxpayer_bill.dart';
 import 'dart:convert' as convert;
 import 'package:tekra_app/src/utils/dialog.dart';
 
@@ -221,6 +222,7 @@ class _OptionsUserState extends State<OptionsUser> {
                               itemBuilder: (context, index) {
                                 return CardOptions(
                                   title: bills[index].despliegue,
+                                  route: SmallTaxpayerBill(),
                                 );
                               }),
                 ),
@@ -258,6 +260,7 @@ class _OptionsUserState extends State<OptionsUser> {
         //Verifica si el usuario tienen uno cliente asignado o más para mostrar el select correspondiente.
         if (_clients.length == 1) {
           setState(() {
+            clients = _clients;
             uniqueClient = "Client: ${_clients[0].nombre}";
             someClients = false;
             isLoadClientSelect = false;
@@ -283,7 +286,6 @@ class _OptionsUserState extends State<OptionsUser> {
         progressDialog.dismiss();
       }
     } else {
-      print(response);
       gFunct.showModalDialog(
           "Error en el servidor",
           "Se generó un error en el servidor, intetelo en unos minutos",
@@ -340,12 +342,13 @@ class _OptionsUserState extends State<OptionsUser> {
         }
         if (_contracts.length == 1) {
           setState(() {
+            contracts = _contracts;
             uniqueContract = "No. de contrato: ${_contracts[0].noContrato}";
             someContracts = false;
             isLoadContractSelect = false;
             progressDialog.dismiss();
-            loadBills(_contracts[0].noContrato);
-            saveContract(_contracts[0].noContrato);
+            loadBills(_contracts[0].correlativoContrato);
+            saveContract(_contracts[0].correlativoContrato);
             lContracts = false;
           });
         } else {

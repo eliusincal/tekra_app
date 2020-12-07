@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tekra_app/src/screens/small_taxpayer_bill.dart';
 
 class CardOptions extends StatelessWidget {
   const CardOptions({
-    this.title
+    this.title,
+    this.route
   });
 
   final String title;
+  final route;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class CardOptions extends StatelessWidget {
         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString("invoiceTitle", title);
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => SmallTaxpayerBill()));
+            MaterialPageRoute(builder: (context) => route));
       },
       child: Container(
         height: 200,
