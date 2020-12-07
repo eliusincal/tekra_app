@@ -115,7 +115,6 @@ class SmallTaxpayer3 extends State<SmallTaxpayerBill3> {
               ),
               GestureDetector(
                   onTap: () {
-                    print(detailBills);
                     detailBills.insert(
                         0,
                         DetailInvoice(
@@ -124,8 +123,6 @@ class SmallTaxpayer3 extends State<SmallTaxpayerBill3> {
                             valorUnitario: "",
                             descuentoUnitario: "",
                             descripcion: ""));
-                    print("HOLA");
-                    print(detailBills);
                     setState(() {});
                   },
                   child: SizedBox(
@@ -479,9 +476,6 @@ class SmallTaxpayer3 extends State<SmallTaxpayerBill3> {
 
   saveInfo() async {
     if (formKey.currentState.validate()) {
-      for (var detail in detailBills) {
-        print(detail.toString());
-      }
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => SmallTaxpayerBill3()));
     }
@@ -506,12 +500,7 @@ class SmallTaxpayer3 extends State<SmallTaxpayerBill3> {
   calculateTotal() {
     var cont = 1;
     var total = 0.00;
-    print(detailBills);
-    print(detailBills.length);
     for (var det in detailBills) {
-      print("HOLA");
-      print(cont);
-      print(det.valorUnitario);
       total += double.parse(det.valorUnitario);
       cont++;
     }

@@ -31,6 +31,7 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
   String contractNumber = "N/A";
   String startDate = "0000-00-00";
   String endDate = "0000-00-00";
+  String mensajeNIT = "";
 
   @override
   initState() {
@@ -114,8 +115,13 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
                           if (val.isEmpty) {
                             return "Dato necesario";
                           }
-                          return null;
+                          if (val.length != 9) return null;
                         },
+                      ),
+                      Text(
+                        mensajeNIT,
+                        style: TextStyle(color: Colors.redAccent),
+                        textAlign: TextAlign.start,
                       ),
                       SizedBox(
                         height: 10,
@@ -126,6 +132,12 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
                         isNumber: false,
                         isLocked: true,
                         controller: nameController,
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return "Dato necesario";
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(
                         height: 10,
@@ -136,6 +148,12 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
                         isNumber: false,
                         isLocked: true,
                         controller: addressController,
+                        validator: (val) {
+                          if (val.isEmpty) {
+                            return "Dato necesario";
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(
                         height: 10,
@@ -149,6 +167,12 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
                         validator: (val) {
                           if (val.isEmpty) {
                             return "Dato necesario";
+                          }
+                          bool emailValid = RegExp(
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(val);
+                          if(!emailValid){
+                            return "Email no válido";
                           }
                           return null;
                         },
@@ -211,7 +235,7 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
     ProgressDialog progressDialog = ProgressDialog(context);
     GlobalFunctions global = GlobalFunctions();
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if (nitController.text.length == 9) {
+    if (nitController.text.length >= 8 && nitController.text.length <= 9) {
       progressDialog.show();
       Map data = {
         "autenticacion": {
@@ -220,12 +244,13 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
         },
         "parametros": {
           "pn_empresa": "1",
-          "pn_cliente": sharedPreferences.get("clientName"),
+          "pn_cliente": sharedPreferences.get("client"),
           "pn_contrato": sharedPreferences.get("contract"),
           "pn_nit": nitController.text
         }
       };
       var body = convert.jsonEncode(data);
+      print(body);
       var jsonData;
       var response = await http.post(
           "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/contribuyente/contribuyente_consulta",
@@ -235,8 +260,26 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
         jsonData = json.decode(response.body);
         if (jsonData['resultado'][0]['error'] == 0) {
           progressDialog.dismiss();
+          if (jsonData['datos'].length == 0) {
+            setState(() {
+              nameController.text = "";
+              addressController.text = "";
+              mensajeNIT = "NIT no existente";
+            });
+          } else {
+            setState(() {
+              mensajeNIT = "  ";
+              nameController.text = jsonData['datos'][0]['nombre'];
+              addressController.text =
+                  jsonData['datos'][0]['direccion_completa'];
+            });
+          }
         } else {
           progressDialog.dismiss();
+          global.showModalDialog(
+              "Error en el servidor",
+              "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
+              context);
         }
       } else if (response.statusCode == 500) {
         progressDialog.dismiss();
@@ -245,6 +288,12 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
             "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
             context);
       }
+    } else {
+      setState(() {
+        nameController.text = "";
+        addressController.text = "";
+        mensajeNIT = "";
+      });
     }
   }
 
