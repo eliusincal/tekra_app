@@ -251,7 +251,7 @@ class SmallTaxpayer3 extends State<SmallTaxpayerBill3> {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            "Item",
+                            "Item ${detailBills.length - index}",
                             style: TextStyle(
                               color: Color(0xff051228),
                               fontSize: 20,
@@ -638,7 +638,7 @@ class _ProductState extends State<ProductDropDown> {
     super.initState();
     if (SmallTaxpayer3.detailBills[widget.index].producto != "") {
       _value = SmallTaxpayer3.detailBills[widget.index].producto;
-    }else{
+    } else {
       _value = widget.product.producto;
     }
   }
@@ -674,8 +674,10 @@ class _ProductState extends State<ProductDropDown> {
                 child: new Text(product.despliegue), value: product.producto);
           }).toList(),
           onChanged: (val) {
-            _value = val;
-            SmallTaxpayer3.detailBills[widget.index].producto = val;
+            setState(() {
+              _value = val;
+              SmallTaxpayer3.detailBills[widget.index].producto = val;
+            });
           }),
     );
   }
