@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
 import 'package:tekra_app/src/screens/components/rounded_input_field.dart';
-import 'package:tekra_app/src/screens/manage_products.dart';
 import 'package:tekra_app/src/utils/dialog.dart';
 
 class NewProduct extends StatefulWidget {

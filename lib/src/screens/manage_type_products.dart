@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:tekra_app/src/screens/components/rounded_button.dart';
 import 'package:tekra_app/src/screens/edit_type_products.dart';
 import 'package:tekra_app/src/screens/new_type_product.dart';
-import 'package:tekra_app/src/screens/settings.dart';
 import 'dart:convert' as convert;
 
 import 'package:tekra_app/src/utils/dialog.dart';
