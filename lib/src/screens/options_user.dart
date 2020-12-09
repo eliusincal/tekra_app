@@ -223,6 +223,7 @@ class _OptionsUserState extends State<OptionsUser> {
                                 return CardOptions(
                                   title: bills[index].despliegue,
                                   route: SmallTaxpayerBill(),
+                                  codeTypeBill: bills[index].documentoTipo
                                 );
                               }),
                 ),

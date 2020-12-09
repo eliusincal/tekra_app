@@ -25,7 +25,7 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
   final establecientoSeleccionado = TextEditingController();
   //Valores para el dropdown de Establecimiento
   String establishmentValue;
-  //Valores para el dropdown de Modena
+  //Valores para el dropdown de Moneda
   String coinVal;
   bool exchangeRateIsLocked = true;
   TextEditingController exchangeRateController = TextEditingController();
@@ -300,7 +300,7 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
       sharedPreferences.setString("dateGeneratedInvoice", dateController.text);
       sharedPreferences.setString("establishment", establishmentValue);
       sharedPreferences.setString("coin", coinVal);
-      sharedPreferences.setString("key", exchangeRateController.text);
+      sharedPreferences.setString("exchangeRate", exchangeRateController.text);
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => SmallTaxpayerBill2()));
     }

@@ -304,7 +304,7 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
       sharedPreferences.setString("nitInvoice", nitController.text);
       sharedPreferences.setString("nameInvoice", nameController.text);
       sharedPreferences.setString("addressInvoice", addressController.text);
-      sharedPreferences.setString("emailIvoice", emailoController.text);
+      sharedPreferences.setString("emailInvoice", emailoController.text);
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => SmallTaxpayerBill3()));
     }

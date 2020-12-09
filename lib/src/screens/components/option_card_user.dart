@@ -4,11 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CardOptions extends StatelessWidget {
   const CardOptions({
     this.title,
-    this.route
+    this.route,
+    this.codeTypeBill
   });
 
   final String title;
   final route;
+  final codeTypeBill;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +18,7 @@ class CardOptions extends StatelessWidget {
       onTap: () async {
         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
         sharedPreferences.setString("invoiceTitle", title);
+        sharedPreferences.setString("code_type_bill", codeTypeBill);
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => route));
       },

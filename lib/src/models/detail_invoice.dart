@@ -3,20 +3,26 @@ class DetailInvoice {
       producto,
       valorUnitario,
       descuentoUnitario,
-      descripcion;
+      descripcion,
+      identificador,
+      tipoProducto;
   DetailInvoice(
       this.cantidad,
       this.producto,
       this.valorUnitario,
       this.descuentoUnitario,
-      this.descripcion);
+      this.descripcion,
+      this.identificador,
+      this.tipoProducto);
 
   DetailInvoice.fromJson(Map<String, dynamic> json)
       : cantidad = json["cantidad"].toString(),
       producto = json["producto"].toString(),
       valorUnitario = json["valorUnitario"].toString(),
       descuentoUnitario = json["descuentoUnitario"].toString(),
-      descripcion = json["descripcion"].toString()
+      descripcion = json["descripcion"].toString(),
+      identificador = json["descripcion"].toString(),
+      tipoProducto = json["descripcion"].toString()
       ;
 
   Map<String, dynamic> toJson()=>{

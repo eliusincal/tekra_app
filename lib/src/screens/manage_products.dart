@@ -35,7 +35,7 @@ class _ManageProducts extends State<ManageProducts> {
   bool lTypeProducts = false;
   String typeProductValue;
 
-  //Variables necesarias para los objetos relacionas a Facturas
+  //Variables necesarias para los objetos relacionas a Productos
   List<Product> productsList;
   bool isLoadProducts = true;
   bool lProducts = false;

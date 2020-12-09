@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tekra_app/src/models/detail_invoice.dart';
 
 class GlobalFunctions {
   String globalURL = "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/";
@@ -58,4 +59,18 @@ class GlobalFunctions {
       }
     );
   }
+
+  calculateTotal(List<DetailInvoice> invoiceList){
+    var total = 0.00;
+    for (var invoice in invoiceList){
+      if(invoice.valorUnitario != ""){
+        total += double.parse(invoice.valorUnitario);
+      }
+      if(invoice.descuentoUnitario != ""){
+        total -= double.parse(invoice.descuentoUnitario);
+      }
+    }
+    return total;
+  }
+
 }
