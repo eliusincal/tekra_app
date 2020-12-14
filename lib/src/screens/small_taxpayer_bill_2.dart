@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tekra_app/src/global/global.dart';
 import 'package:tekra_app/src/screens/components/rounded_button.dart';
 import 'package:tekra_app/src/screens/components/rounded_input_field_invoice.dart';
-import 'package:tekra_app/src/screens/home.dart';
 import 'package:tekra_app/src/screens/small_taxpayer_bill.dart';
 import 'package:tekra_app/src/screens/small_taxpayer_bill_3.dart';
 import 'package:tekra_app/src/utils/dialog.dart';
@@ -44,6 +43,7 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final node = FocusScope.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -52,133 +52,132 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
           width: size.width * 0.9,
           child: Column(
             children: [
-              SizedBox(
-                height: 30,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Home()));
-                  },
-                  child: Icon(Icons.close),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  invoiceTitle,
-                  style: TextStyle(
-                    color: Color(0xff051228),
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Información de Cliente",
-                style: TextStyle(
-                  color: Color(0xff26b5e6),
-                  fontSize: 20,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Form(
-                key: formKey,
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20,
+              Flexible(
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        invoiceTitle,
+                        style: TextStyle(
+                          color: Color(0xff051228),
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      RoundedInputFieldInvoice(
-                        text: "NIT",
-                        onChanged: (value) {
-                          verifyNIT(value);
-                        },
-                        isNumber: true,
-                        isLocked: false,
-                        controller: nitController,
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return "Dato necesario";
-                          }
-                          if (val.length != 9) return null;
-                        },
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Información de Cliente",
+                      style: TextStyle(
+                        color: Color(0xff26b5e6),
+                        fontSize: 20,
                       ),
-                      Text(
-                        mensajeNIT,
-                        style: TextStyle(color: Colors.redAccent),
-                        textAlign: TextAlign.start,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Form(
+                      key: formKey,
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 20,
+                            ),
+                            FocusScope(
+                              child: Focus(
+                                onFocusChange: (focus) {
+                                  print("focus $focus");
+                                  if (!focus) {
+                                    verifyNIT();
+                                  }
+                                },
+                                child: RoundedInputFieldInvoice(
+                                  onSubmitted: (val) {
+                                    verifyNIT();
+                                    node.nextFocus();
+                                  },
+                                  text: "NIT",
+                                  isLocked: false,
+                                  controller: nitController,
+                                  validator: (val) {
+                                    if (val.isEmpty) {
+                                      return "Dato necesario";
+                                    }
+                                    if (val.length != 9) return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            mensajeNIT != ""
+                                ? Text(
+                                    mensajeNIT,
+                                    style: TextStyle(color: Colors.redAccent),
+                                    textAlign: TextAlign.start,
+                                  )
+                                : Container(),
+                            RoundedInputFieldInvoice(
+                              text: "Nombre",
+                              onChanged: (value) {},
+                              isNumber: false,
+                              isLocked: true,
+                              controller: nameController,
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return "Dato necesario";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            RoundedInputFieldInvoice(
+                              text: "Dirección",
+                              onChanged: (value) {},
+                              isNumber: false,
+                              isLocked: true,
+                              controller: addressController,
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return "Dato necesario";
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            RoundedInputFieldInvoice(
+                              text: "Correo(s) para la notificacion",
+                              onChanged: (value) {},
+                              isNumber: false,
+                              isLocked: false,
+                              controller: emailoController,
+                              validator: (val) {
+                                if (val.isEmpty) {
+                                  return "Dato necesario";
+                                }
+                                bool emailValid = RegExp(
+                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                    .hasMatch(val);
+                                if (!emailValid) {
+                                  return "Email no válido";
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      RoundedInputFieldInvoice(
-                        text: "Nombre",
-                        onChanged: (value) {},
-                        isNumber: false,
-                        isLocked: true,
-                        controller: nameController,
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return "Dato necesario";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      RoundedInputFieldInvoice(
-                        text: "Dirección",
-                        onChanged: (value) {},
-                        isNumber: false,
-                        isLocked: true,
-                        controller: addressController,
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return "Dato necesario";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      RoundedInputFieldInvoice(
-                        text: "Correo(s) para la notificacion",
-                        onChanged: (value) {},
-                        isNumber: false,
-                        isLocked: false,
-                        controller: emailoController,
-                        validator: (val) {
-                          if (val.isEmpty) {
-                            return "Dato necesario";
-                          }
-                          bool emailValid = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(val);
-                          if(!emailValid){
-                            return "Email no válido";
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -231,69 +230,61 @@ class SmallTaxpayer2 extends State<SmallTaxpayerBill2> {
     );
   }
 
-  verifyNIT(nit) async {
-    ProgressDialog progressDialog = ProgressDialog(context);
+  verifyNIT() async {
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     GlobalFunctions global = GlobalFunctions();
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if (nitController.text.length >= 8 && nitController.text.length <= 9) {
-      progressDialog.show();
-      Map data = {
-        "autenticacion": {
-          "pn_usuario": sharedPreferences.get("user"),
-          "pn_clave": sharedPreferences.get("pass")
-        },
-        "parametros": {
-          "pn_empresa": "1",
-          "pn_cliente": sharedPreferences.get("client"),
-          "pn_contrato": sharedPreferences.get("contract"),
-          "pn_nit": nitController.text
-        }
-      };
-      var body = convert.jsonEncode(data);
-      print(body);
-      var jsonData;
-      var response = await http.post(
-          "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/contribuyente/contribuyente_consulta",
-          headers: {"Content-Type": "application/json"},
-          body: body);
-      if (response.statusCode == 200) {
-        jsonData = json.decode(response.body);
-        if (jsonData['resultado'][0]['error'] == 0) {
-          progressDialog.dismiss();
-          if (jsonData['datos'].length == 0) {
-            setState(() {
-              nameController.text = "";
-              addressController.text = "";
-              mensajeNIT = "NIT no existente";
-            });
-          } else {
-            setState(() {
-              mensajeNIT = "  ";
-              nameController.text = jsonData['datos'][0]['nombre'];
-              addressController.text =
-                  jsonData['datos'][0]['direccion_completa'];
-            });
-          }
+    progressDialog.show();
+    nitController.text = nitController.text.replaceAll("-", "");
+    Map data = {
+      "autenticacion": {
+        "pn_usuario": sharedPreferences.get("user"),
+        "pn_clave": sharedPreferences.get("pass")
+      },
+      "parametros": {
+        "pn_empresa": "1",
+        "pn_cliente": sharedPreferences.get("client"),
+        "pn_contrato": sharedPreferences.get("contract"),
+        "pn_nit": nitController.text
+      }
+    };
+    var body = convert.jsonEncode(data);
+    print(body);
+    var jsonData;
+    var response = await http.post(
+        "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/contribuyente/contribuyente_consulta",
+        headers: {"Content-Type": "application/json"},
+        body: body);
+    if (response.statusCode == 200) {
+      jsonData = json.decode(response.body);
+      if (jsonData['resultado'][0]['error'] == 0) {
+        progressDialog.dismiss();
+        if (jsonData['datos'].length == 0) {
+          setState(() {
+            nameController.text = "";
+            addressController.text = "";
+            mensajeNIT = "NIT no existente";
+          });
         } else {
-          progressDialog.dismiss();
-          global.showModalDialog(
-              "Error en el servidor",
-              "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
-              context);
+          setState(() {
+            mensajeNIT = "  ";
+            nameController.text = jsonData['datos'][0]['nombre'];
+            addressController.text = jsonData['datos'][0]['direccion_completa'];
+          });
         }
-      } else if (response.statusCode == 500) {
+      } else {
         progressDialog.dismiss();
         global.showModalDialog(
             "Error en el servidor",
             "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
             context);
       }
-    } else {
-      setState(() {
-        nameController.text = "";
-        addressController.text = "";
-        mensajeNIT = "";
-      });
+    } else if (response.statusCode == 500) {
+      progressDialog.dismiss();
+      global.showModalDialog(
+          "Error en el servidor",
+          "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
+          context);
     }
   }
 

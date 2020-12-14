@@ -7,6 +7,8 @@ class RoundedInputFieldInvoice extends StatelessWidget {
   final validator;
   final controller;
   final isLocked;
+  final onSubmitted;
+  final focusNode;
   const RoundedInputFieldInvoice({
     Key key,
     this.text,
@@ -14,7 +16,9 @@ class RoundedInputFieldInvoice extends StatelessWidget {
     this.isNumber = false,
     this.validator,
     this.controller,
-    this.isLocked = false
+    this.isLocked = false,
+    this.onSubmitted,
+    this.focusNode
   }) : super(key: key);
 
   @override
@@ -38,6 +42,8 @@ class RoundedInputFieldInvoice extends StatelessWidget {
                 height: 10,
               ),
               TextFormField(
+                focusNode: focusNode,
+                onFieldSubmitted: onSubmitted,
                 readOnly: isLocked,
                 keyboardType: isNumber ? TextInputType.number : TextInputType.text,
                 onChanged: onChanged,

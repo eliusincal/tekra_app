@@ -58,191 +58,176 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
           width: size.width * 0.9,
           child: Column(
             children: [
-              SizedBox(
-                height: 30,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(Icons.close),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  invoiceTitle,
-                  style: TextStyle(
-                    color: Color(0xff051228),
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Información de Emisión",
-                style: TextStyle(
-                  color: Color(0xff26b5e6),
-                  fontSize: 15,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              CardInfo(
-                size: size,
-                transmitter: transmitter,
-                endDate: endDate,
-                startDate: startDate,
-                contractNumber: contractNumber,
-                finished: finished,
-              ),
-              SizedBox(
-                height: 10,
-              ),
               Flexible(
-                child: Form(
-                  key: formKey,
-                  child: ListView(
-                    children: <Widget>[
-                      RoundedDateInput(
-                        controller: dateController,
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: 40,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        invoiceTitle,
+                        style: TextStyle(
+                          color: Color(0xff051228),
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Column(children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Estableciminento",
-                            style: TextStyle(
-                                color: Color(0xff051228), fontSize: 15.00),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CardInfo(
+                      size: size,
+                      transmitter: transmitter,
+                      endDate: endDate,
+                      startDate: startDate,
+                      contractNumber: contractNumber,
+                      finished: finished,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Form(
+                      key: formKey,
+                      child: Column(
+                        children: <Widget>[
+                          RoundedDateInput(
+                            controller: dateController,
                           ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          child: DropdownButtonFormField(
-                            validator: (value) =>
-                                value == null ? 'Dato obligatorio' : null,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Colors.white, width: 2)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffa8e1f5), width: 2)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffa8e1f5), width: 2)),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Column(children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Estableciminento",
+                                style: TextStyle(
+                                    color: Color(0xff051228), fontSize: 15.00),
+                              ),
                             ),
-                            hint: Text("Establecimiento"),
-                            dropdownColor: Colors.white,
-                            elevation: 5,
-                            icon: Icon(Icons.arrow_drop_down),
-                            isExpanded: true,
-                            value: establishmentValue,
-                            onChanged: (value) {
-                              setState(() {
-                                establishmentValue = value;
-                              });
-                            },
-                            items: establishmentList.map((establishment) {
-                              return DropdownMenuItem(
-                                  value: establishment.establecimiento,
-                                  child: Text(establishment.despliegue));
-                            }).toList(),
-                          ),
-                        ),
-                      ]),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Column(children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Moneda",
-                            style: TextStyle(
-                                color: Color(0xff051228), fontSize: 15.00),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          child: DropdownButtonFormField(
-                            validator: (value) =>
-                                value == null ? 'Dato obligatorio' : null,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Colors.white, width: 2)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffa8e1f5), width: 2)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                  borderSide: BorderSide(
-                                      color: Color(0xffa8e1f5), width: 2)),
+                            SizedBox(
+                              height: 10,
                             ),
-                            hint: Text("Moneda"),
-                            dropdownColor: Colors.white,
-                            elevation: 5,
-                            icon: Icon(Icons.arrow_drop_down),
-                            isExpanded: true,
-                            value: coinVal,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == "GTQ") {
-                                  exchangeRateIsLocked = true;
-                                } else {
-                                  exchangeRateIsLocked = false;
-                                }
-                                coinVal = value;
-                              });
-                            },
-                            items: coinList.map((coin) {
-                              return DropdownMenuItem(
-                                  value: coin.moneda,
-                                  child: Text(coin.nombreMoneda));
-                            }).toList(),
+                            Container(
+                              child: DropdownButtonFormField(
+                                validator: (value) =>
+                                    value == null ? 'Dato obligatorio' : null,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Colors.white, width: 2)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                ),
+                                hint: Text("Establecimiento"),
+                                dropdownColor: Colors.white,
+                                elevation: 5,
+                                icon: Icon(Icons.arrow_drop_down),
+                                isExpanded: true,
+                                value: establishmentValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    establishmentValue = value;
+                                  });
+                                },
+                                items: establishmentList.map((establishment) {
+                                  return DropdownMenuItem(
+                                      value: establishment.establecimiento,
+                                      child: Text(establishment.despliegue));
+                                }).toList(),
+                              ),
+                            ),
+                          ]),
+                          SizedBox(
+                            height: 10,
                           ),
-                        ),
-                      ]),
-                      SizedBox(
-                        height: 10,
+                          Column(children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Moneda",
+                                style: TextStyle(
+                                    color: Color(0xff051228), fontSize: 15.00),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              child: DropdownButtonFormField(
+                                validator: (value) =>
+                                    value == null ? 'Dato obligatorio' : null,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Colors.white, width: 2)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                ),
+                                hint: Text("Moneda"),
+                                dropdownColor: Colors.white,
+                                elevation: 5,
+                                icon: Icon(Icons.arrow_drop_down),
+                                isExpanded: true,
+                                value: coinVal,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value == "GTQ") {
+                                      exchangeRateIsLocked = true;
+                                      exchangeRateController.text = "1.00";
+                                    } else {
+                                      exchangeRateIsLocked = false;
+                                    }
+                                    coinVal = value;
+                                  });
+                                },
+                                items: coinList.map((coin) {
+                                  return DropdownMenuItem(
+                                      value: coin.moneda,
+                                      child: Text(coin.nombreMoneda));
+                                }).toList(),
+                              ),
+                            ),
+                          ]),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          coinVal != "GTQ"
+                              ? RoudedExchangeRate(
+                                  text: "Tipo de cambio",
+                                  onChanged: (value) {},
+                                  isNumber: true,
+                                  isLocked: exchangeRateIsLocked,
+                                  controller: exchangeRateController,
+                                  validator: (val) {
+                                    if (coinVal != "GTQ" && val.isEmpty) {
+                                      return "Dato obligatorio";
+                                    }
+                                    return null;
+                                  },
+                                )
+                              : Container(),
+                        ],
                       ),
-                      RoudedExchangeRate(
-                        text: "Tipo de cambio",
-                        onChanged: (value) {},
-                        isNumber: true,
-                        isLocked: exchangeRateIsLocked,
-                        controller: exchangeRateController,
-                        validator: (val) {
-                          if (coinVal != "GTQ" && val.isEmpty) {
-                            return "Dato obligatorio";
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -300,7 +285,12 @@ class SmallTaxpayer extends State<SmallTaxpayerBill> {
       sharedPreferences.setString("dateGeneratedInvoice", dateController.text);
       sharedPreferences.setString("establishment", establishmentValue);
       sharedPreferences.setString("coin", coinVal);
-      sharedPreferences.setString("exchangeRate", exchangeRateController.text);
+      if (coinVal != "GTQ") {
+        sharedPreferences.setString(
+            "exchangeRate", exchangeRateController.text);
+      } else {
+        sharedPreferences.setString("exchangeRate", "1.00");
+      }
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => SmallTaxpayerBill2()));
     }
@@ -468,7 +458,7 @@ class CardInfo extends StatelessWidget {
                     "Emisor",
                     style: TextStyle(
                       color: Color(0xffbbbbbb),
-                      fontSize: 18,
+                      fontSize: 17,
                     ),
                   ),
                 ),
@@ -478,128 +468,62 @@ class CardInfo extends StatelessWidget {
                     transmitter,
                     style: TextStyle(
                       color: Color(0xff555555),
-                      fontSize: 20,
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Contrato",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Color(0xff69717e),
-                      ),
-                    ),
-                    Expanded(
-                      child: new Container(
-                          margin:
-                              const EdgeInsets.only(left: 20.0, right: 10.0),
-                          child: Divider(
-                            color: Colors.black,
-                            height: 36,
-                          )),
-                    ),
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "No.",
-                    style: TextStyle(
-                      color: Color(0xffbbbbbb),
                       fontSize: 17,
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    contractNumber,
+                    "No. de contrato: $contractNumber",
                     style: TextStyle(
                       color: Color(0xff555555),
-                      fontSize: 19,
+                      fontSize: 17,
                     ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Fecha inicio",
-                            style: TextStyle(
-                              color: Color(0xffbbbbbb),
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            startDate,
-                            style: TextStyle(
-                              color: Color(0xff555555),
-                              fontSize: 19,
-                            ),
-                          ),
-                        ),
-                      ],
+                SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Fecha inicio: $startDate",
+                    style: TextStyle(
+                      color: Color(0xff555555),
+                      fontSize: 17,
                     ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Fecha Fin",
-                            style: TextStyle(
-                              color: Color(0xffbbbbbb),
-                              fontSize: 17,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            endDate,
-                            style: TextStyle(
-                              color: Color(0xff555555),
-                              fontSize: 19,
-                            ),
-                          ),
-                        ),
-                      ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Fecha de finalización: $endDate",
+                    style: TextStyle(
+                      color: Color(0xff555555),
+                      fontSize: 17,
                     ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Finalizado",
-                            style: TextStyle(
-                              color: Color(0xffbbbbbb),
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            finished,
-                            style: TextStyle(
-                              color: Color(0xff555555),
-                              fontSize: 19,
-                            ),
-                          ),
-                        ),
-                      ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Finalizado: $finished",
+                    style: TextStyle(
+                      color: Color(0xff555555),
+                      fontSize: 17,
                     ),
-                  ],
-                )
+                  ),
+                ),
               ],
             )),
       ),

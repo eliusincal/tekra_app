@@ -14,6 +14,7 @@ import 'dart:convert' as convert;
 import 'package:tekra_app/src/utils/dialog.dart';
 
 class ManageProducts extends StatefulWidget {
+  static const String routeName = "/manage_products";
   _ManageProducts createState() => _ManageProducts();
 }
 
@@ -34,9 +35,10 @@ class _ManageProducts extends State<ManageProducts> {
   bool isLoadTypeProductSelect = true;
   bool lTypeProducts = false;
   String typeProductValue;
+  bool typeProductSelected = false;
 
   //Variables necesarias para los objetos relacionas a Productos
-  List<Product> productsList;
+  List<Product> productsList = [];
   bool isLoadProducts = true;
   bool lProducts = false;
 
@@ -55,151 +57,20 @@ class _ManageProducts extends State<ManageProducts> {
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
           child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 40,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(Icons.close),
-                ),
-              ),
-              isLoadClientSelect
-                  ? Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 40.0, bottom: 20.00),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  : someClients && clientsList.length != 0
-                      ? Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, right: 16.0, top: 40.0),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 16, right: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: new DropdownButton(
-                                value: clientValue,
-                                hint: Text("Seleccionar cliente"),
-                                dropdownColor: Color(0xffff7f7f7),
-                                icon: Icon(Icons.arrow_drop_down),
-                                iconSize: 36,
-                                isExpanded: true,
-                                underline: SizedBox(),
-                                items: clientsList.map((cliente) {
-                                  return new DropdownMenuItem(
-                                      child: new Text(cliente.nombre != null
-                                          ? cliente.nombre
-                                          : "N/A"),
-                                      value: cliente.cliente);
-                                }).toList(),
-                                onChanged: (val) {
-                                  clientSelected = true;
-                                  loadTypeProducts(val);
-                                  setState(() {
-                                    clientValue = val;
-                                  });
-                                }),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                              top: 40.0,
-                              bottom: 20.00),
-                          child: Center(
-                            child: Text(
-                              uniqueClient != "" ? uniqueClient : "N/A",
-                              style: TextStyle(fontSize: 18),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-              isLoadTypeProductSelect
-                  ? someClients && !lTypeProducts
-                      ? Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                              top: 40.0,
-                              bottom: 20.00),
-                          child: Center(
-                            child: Text("Seleccione a un cliente..."),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                              top: 40.0,
-                              bottom: 20.00),
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                  : someTypeProduct && typeProductsList.length != 0
-                      ? Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, right: 16.0, top: 40.0),
-                          child: Container(
-                            padding: EdgeInsets.only(left: 16, right: 16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey, width: 2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: new DropdownButton(
-                                value: typeProductValue,
-                                hint: Text("Seleccionar tipo de producto"),
-                                dropdownColor: Color(0xffff7f7f7),
-                                icon: Icon(Icons.arrow_drop_down),
-                                iconSize: 36,
-                                isExpanded: true,
-                                underline: SizedBox(),
-                                items: typeProductsList.map((typeProduct) {
-                                  return new DropdownMenuItem(
-                                      child: new Text(typeProduct
-                                                  .tipoProductoDescripcion !=
-                                              null
-                                          ? typeProduct.tipoProductoDescripcion
-                                          : "N/A"),
-                                      value: typeProduct.tipoProducto);
-                                }).toList(),
-                                onChanged: (val) {
-                                  setState(() {
-                                    typeProductValue = val;
-                                  });
-                                  loadProducts();
-                                }),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0,
-                              right: 16.0,
-                              top: 40.0,
-                              bottom: 20.00),
-                          child: Center(
-                            child: Text(
-                              uniqueTypeProduct != ""
-                                  ? uniqueTypeProduct
-                                  : "Tipo de producto no encontrado",
-                              style: TextStyle(fontSize: 18),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
+            children: [
               Flexible(
-                child: isLoadProducts
-                    ? someTypeProduct && !lProducts
+                child: ListView(
+                  children: <Widget>[
+                    // Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: GestureDetector(
+                    //     onTap: () {
+                    //       Navigator.of(context).pop();
+                    //     },
+                    //     child: Icon(Icons.close),
+                    //   ),
+                    // ),
+                    isLoadClientSelect
                         ? Padding(
                             padding: const EdgeInsets.only(
                                 left: 16.0,
@@ -207,143 +78,419 @@ class _ManageProducts extends State<ManageProducts> {
                                 top: 40.0,
                                 bottom: 20.00),
                             child: Center(
-                              child: Text("Seleccione un tipo de producto"),
+                              child: CircularProgressIndicator(),
                             ),
                           )
-                        : lTypeProducts || !clientSelected
-                            ? Center()
-                            : Center(
-                                child: CircularProgressIndicator(),
-                              )
-                    : productsList.length == 0
-                        ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0,
-                                right: 16.0,
-                                top: 40.0,
-                                bottom: 20.00),
-                            child: Center(
-                              child: Text(
-                                  "No hay productos relacionados a este tipo de producto."),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: productsList.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                height: 100,
-                                child: Card(
-                                  color: Color(0xfff4fbfe),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
+                        : someClients && clientsList.length != 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0, top: 40.0),
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey, width: 2),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 5.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Container(
-                                            margin: EdgeInsets.symmetric(
-                                                vertical: 25, horizontal: 10),
-                                            child: Text(
-                                              productsList[index].descripcion !=
-                                                      null
-                                                  ? productsList[index]
-                                                      .descripcion
-                                                  : "N/A",
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                color: Color(0xff051228),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              editProduct(
-                                                  productsList[index].producto);
-                                            },
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(
-                                                  vertical: 15, horizontal: 10),
-                                              child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Icon(
-                                                    Icons.edit,
-                                                    color: Colors.yellow,
-                                                  )),
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              deleteProduct(
-                                                  context,
-                                                  productsList[index].producto,
-                                                  productsList[index]
-                                                      .descripcion);
-                                            },
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(
-                                                  vertical: 15, horizontal: 10),
-                                              child: Align(
-                                                  alignment: Alignment.center,
-                                                  child: Icon(Icons.delete,
-                                                      color: Colors.red)),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  child: new DropdownButton(
+                                      value: clientValue,
+                                      hint: Text("Seleccionar cliente"),
+                                      dropdownColor: Color(0xffff7f7f7),
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconSize: 36,
+                                      isExpanded: true,
+                                      underline: SizedBox(),
+                                      items: clientsList.map((cliente) {
+                                        return new DropdownMenuItem(
+                                            child: new Text(
+                                                cliente.nombre != null
+                                                    ? cliente.nombre
+                                                    : "N/A"),
+                                            value: cliente.cliente);
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        clientSelected = true;
+                                        loadTypeProducts();
+                                        setState(() {
+                                          clientValue = val;
+                                        });
+                                      }),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text(
+                                    uniqueClient != "" ? uniqueClient : "N/A",
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                              );
-                            }),
+                              ),
+                    isLoadTypeProductSelect
+                        ? someClients && !lTypeProducts
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text("Seleccione a un cliente..."),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                        : someTypeProduct && typeProductsList.length != 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0, top: 40.0),
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey, width: 2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: new DropdownButton(
+                                      value: typeProductValue,
+                                      hint:
+                                          Text("Seleccionar tipo de producto"),
+                                      dropdownColor: Color(0xffff7f7f7),
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconSize: 36,
+                                      isExpanded: true,
+                                      underline: SizedBox(),
+                                      items:
+                                          typeProductsList.map((typeProduct) {
+                                        return new DropdownMenuItem(
+                                            child: new Text(typeProduct
+                                                        .tipoProductoDescripcion !=
+                                                    null
+                                                ? typeProduct
+                                                    .tipoProductoDescripcion
+                                                : "N/A"),
+                                            value: typeProduct.tipoProducto);
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          typeProductValue = val;
+                                        });
+                                        loadProducts();
+                                        typeProductSelected = true;
+                                      }),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text(
+                                    uniqueTypeProduct != ""
+                                        ? uniqueTypeProduct
+                                        : "Tipo de producto no encontrado",
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                    isLoadProducts
+                        ? someTypeProduct && !lProducts
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text("Seleccione un tipo de producto"),
+                                ),
+                              )
+                            : lTypeProducts || !clientSelected
+                                ? Center()
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                        : productsList.length == 0
+                            ? typeProductsList.length != 0
+                                ? Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16.0,
+                                        right: 16.0,
+                                        top: 40.0,
+                                        bottom: 20.00),
+                                    child: Center(
+                                      child: Text(
+                                          "No hay productos relacionados a este tipo de producto."),
+                                    ),
+                                  )
+                                : Container()
+                            : Column(
+                                children: new List.generate(
+                                    productsList.length,
+                                    (index) => Container(
+                                          padding: EdgeInsets.only(
+                                              left: 13, right: 13),
+                                          height: 170,
+                                          child: Card(
+                                            color: Color(0xfff4fbfe),
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 5.0),
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: Container(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            editProduct(
+                                                                productsList[
+                                                                        index]
+                                                                    .producto);
+                                                          },
+                                                          child: Container(
+                                                            margin: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        15,
+                                                                    horizontal:
+                                                                        10),
+                                                            child: Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                child: Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .yellow,
+                                                                )),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            deleteProduct(
+                                                                context,
+                                                                productsList[
+                                                                        index]
+                                                                    .producto,
+                                                                productsList[
+                                                                        index]
+                                                                    .descripcion);
+                                                          },
+                                                          child: Container(
+                                                            margin: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        15,
+                                                                    horizontal:
+                                                                        10),
+                                                            child: Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                child: Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .red)),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: Container(
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 0,
+                                                                  horizontal:
+                                                                      10),
+                                                          child: Text(
+                                                            productsList[index]
+                                                                        .descripcion !=
+                                                                    null
+                                                                ? productsList[
+                                                                        index]
+                                                                    .descripcion
+                                                                : "N/A",
+                                                            style: TextStyle(
+                                                              fontSize: 22,
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: Container(
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 10,
+                                                                  horizontal:
+                                                                      10),
+                                                          child: Text(
+                                                            productsList[index]
+                                                                        .tipoProductoDescripcion !=
+                                                                    null
+                                                                ? productsList[
+                                                                        index]
+                                                                    .tipoProductoDescripcion
+                                                                : "N/A",
+                                                            style: TextStyle(
+                                                              fontSize: 18,
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )),
+                              ),
+                  ],
+                ),
+              ),
+              clientSelected && typeProductSelected
+                  ? GestureDetector(
+                      onTap: () {
+                        newProduct();
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          color: Color(0xfff4fbfe),
+                          child: Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              "Producto",
+                                              style: TextStyle(
+                                                color: Color(0xff051228),
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Icon(
+                                              Icons.add_circle_outline,
+                                              color: Colors.blueAccent,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
+                        ),
+                      ))
+                  : Container(),
+              SizedBox(
+                height: 30,
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        height: 56,
-        margin: EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Container(
-                    alignment: Alignment.center,
-                    child: RoudedButton(
-                      withBorder: true,
-                      color: Colors.white,
-                      textColor: Color(0xff26b5e6),
-                      borderColor: Color(0xff26b5e6),
-                      text: "Agregar Producto",
-                      press: () {
-                        newProduct();
-                      },
-                    )),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  newProduct() {
+  newProduct() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    for (var client in clientsList) {
+      if (client.cliente == clientValue) {
+        sharedPreferences.setString("clientProductNew", client.cliente);
+        sharedPreferences.setString("clientNameProductNew", client.despliegue);
+      }
+    }
+    for (var typeProduct in typeProductsList) {
+      if (typeProduct.tipoProducto == typeProductValue) {
+        sharedPreferences.setString("typeProductNew", typeProduct.tipoProducto);
+        sharedPreferences.setString(
+            "typeProductNameNew", typeProduct.tipoProductoDescripcion);
+      }
+    }
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => NewProduct()),
@@ -376,7 +523,7 @@ class _ManageProducts extends State<ManageProducts> {
             pnPrice = product.precioLista;
           }
         }
-        ProgressDialog progressDialog = ProgressDialog(context);
+        ProgressDialog2 progressDialog = ProgressDialog2(context);
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
         var pnUsuario = sharedPreferences.get("user");
@@ -468,10 +615,11 @@ class _ManageProducts extends State<ManageProducts> {
   }
 
   loadClients() async {
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
+    var clientSel = sharedPreferences.get("clientProductNew");
     Map json = {
       'autenticacion': {'pn_usuario': pnUsuario, 'pn_clave': pnClave},
       'parametros': {'pn_usuario': pnUsuario, 'pn_estado': "1"}
@@ -499,12 +647,19 @@ class _ManageProducts extends State<ManageProducts> {
             uniqueClient = "Client: ${_clients[0].nombre}";
             someClients = false;
             isLoadClientSelect = false;
-            loadTypeProducts(_clients[0].cliente);
+            clientValue = _clients[0].cliente;
+            isLoadTypeProductSelect = true;
+            loadTypeProducts();
             progressDialog.dismiss();
             clientSelected = true;
           });
         } else {
           setState(() {
+            if (clientSel != "") {
+              clientValue = clientSel;
+              clientSelected = true;
+              loadTypeProducts();
+            }
             uniqueClient = "";
             clientsList = _clients;
             isLoadClientSelect = false;
@@ -528,27 +683,27 @@ class _ManageProducts extends State<ManageProducts> {
     }
   }
 
-  loadTypeProducts(client) async {
+  loadTypeProducts() async {
     setState(() {
       isLoadTypeProductSelect = true;
       lTypeProducts = true;
       isLoadProducts = true;
     });
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
+    var typeProductSel = sharedPreferences.get("pass");
     Map json = {
       "autenticacion": {"pn_usuario": pnUsuario, "pn_clave": pnClave},
       "parametros": {
         "pn_empresa": "1",
-        "pn_cliente": client,
+        "pn_cliente": clientValue,
         "pn_producto_tipo": "",
         "pn_activo": "1"
       }
     };
     var jsonData;
-
     var body = convert.jsonEncode(json);
     var response = await http.post(
         gFunct.globalURL +
@@ -564,29 +719,50 @@ class _ManageProducts extends State<ManageProducts> {
         for (var d in datos) {
           _typeProducts.add(TypeProduct.fromJson(d));
         }
-        if (_typeProducts.length == 1) {
+        if (_typeProducts.length == 0) {
+          print("HOLA");
           setState(() {
-            typeProductsList = _typeProducts;
-            uniqueTypeProduct =
-                "Tipo de producto: ${_typeProducts[0].tipoProductoDescripcion}";
+            isLoadProducts = false;
+            typeProductsList = [];
+            productsList = [];
             someTypeProduct = false;
             isLoadTypeProductSelect = false;
-            typeProductValue = _typeProducts[0].tipoProducto;
-            //progressDialog.dismiss();
-            loadProducts();
+            uniqueTypeProduct =
+                "No hay tipo de productos asociados a este cliente";
+            typeProductValue = "";
             lTypeProducts = false;
+            typeProductSelected = false;
           });
         } else {
-          setState(() {
-            uniqueTypeProduct = "";
-            typeProductsList = _typeProducts;
-            typeProductValue = _typeProducts[0].tipoProducto;
-            isLoadTypeProductSelect = false;
-            someTypeProduct = true;
-            //progressDialog.dismiss();
-            lTypeProducts = false;
-            loadProducts();
-          });
+          if (_typeProducts.length == 1) {
+            setState(() {
+              typeProductsList = _typeProducts;
+              uniqueTypeProduct =
+                  "Tipo de producto: ${_typeProducts[0].tipoProductoDescripcion}";
+              someTypeProduct = false;
+              isLoadTypeProductSelect = false;
+              typeProductValue = _typeProducts[0].tipoProducto;
+              //progressDialog.dismiss();
+              loadProducts();
+              lTypeProducts = false;
+              typeProductSelected = true;
+            });
+          } else {
+            setState(() {
+              if (typeProductSel != "") {
+                typeProductSelected = true;
+                typeProductValue = typeProductSel;
+                loadProducts();
+              }
+              uniqueTypeProduct = "";
+              typeProductsList = _typeProducts;
+              typeProductValue = _typeProducts[0].tipoProducto;
+              isLoadTypeProductSelect = false;
+              someTypeProduct = true;
+              //progressDialog.dismiss();
+              lTypeProducts = false;
+            });
+          }
         }
       } else {
         gFunct.showModalDialog(
@@ -660,10 +836,5 @@ class _ManageProducts extends State<ManageProducts> {
           context);
       //progressDialog.dismiss();
     }
-  }
-
-  saveInvoice(invoice) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("invoice", invoice);
   }
 }

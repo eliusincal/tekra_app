@@ -114,7 +114,7 @@ class _ExpiredKey extends State<ExpiredKey> with ValidationMixins {
   }
 
   _submit(context, String user, String pass, String newPass) async{
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     progressDialog.show();
     var result = await Connectivity().checkConnectivity();
     if(result == ConnectivityResult.none){

@@ -4,8 +4,8 @@ import 'package:tekra_app/src/global/global.dart';
 import 'package:tekra_app/src/models/cliente.dart';
 import 'package:tekra_app/src/models/contrato.dart';
 import 'package:tekra_app/src/models/invoice.dart';
-import 'package:tekra_app/src/screens/components/option_card_user.dart';
 import 'package:http/http.dart' as http;
+import 'package:tekra_app/src/screens/components/option_card_user.dart';
 import 'package:tekra_app/src/screens/small_taxpayer_bill.dart';
 import 'dart:convert' as convert;
 import 'package:tekra_app/src/utils/dialog.dart';
@@ -49,83 +49,16 @@ class _OptionsUserState extends State<OptionsUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xfff7f7f7),
-        body: Center(
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-            child: Column(
-              children: <Widget>[
-                isLoadClientSelect
-                    ? Padding(
-                        padding: const EdgeInsets.only(
-                            left: 16.0, right: 16.0, top: 40.0, bottom: 20.00),
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    : someClients && clients.length != 0
+      body: Center(
+        child: Container(
+          child: Column(
+            children: [
+              Flexible(
+                child: ListView(
+                  padding: EdgeInsets.all(10.0),
+                  children: <Widget>[
+                    isLoadClientSelect
                         ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0, right: 16.0, top: 40.0),
-                            child: Container(
-                              padding: EdgeInsets.only(left: 16, right: 16),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.grey, width: 2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: new DropdownButton(
-                                  value: clientValue,
-                                  hint: Text("Seleccionar cliente"),
-                                  dropdownColor: Color(0xffff7f7f7),
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  iconSize: 36,
-                                  isExpanded: true,
-                                  underline: SizedBox(),
-                                  items: clients.map((cliente) {
-                                    return new DropdownMenuItem(
-                                        child: new Text(cliente.nombre != null
-                                            ? cliente.nombre
-                                            : "N/A"),
-                                        value: cliente.cliente);
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    clientSelected = true;
-                                    saveClient(val);
-                                    loadContracts(val);
-                                    setState(() {
-                                      clientValue = val;
-                                    });
-                                  }),
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0,
-                                right: 16.0,
-                                top: 40.0,
-                                bottom: 20.00),
-                            child: Center(
-                              child: Text(
-                                uniqueClient != "" ? uniqueClient : "N/A",
-                                style: TextStyle(fontSize: 18),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                isLoadContractSelect
-                    ? someClients && !lContracts
-                        ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0,
-                                right: 16.0,
-                                top: 40.0,
-                                bottom: 20.00),
-                            child: Center(
-                              child: Text("Seleccione a un cliente..."),
-                            ),
-                          )
-                        : Padding(
                             padding: const EdgeInsets.only(
                                 left: 16.0,
                                 right: 16.0,
@@ -135,106 +68,182 @@ class _OptionsUserState extends State<OptionsUser> {
                               child: CircularProgressIndicator(),
                             ),
                           )
-                    : someContracts && contracts.length != 0
-                        ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0, right: 16.0, top: 40.0),
-                            child: Container(
-                              padding: EdgeInsets.only(left: 16, right: 16),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.grey, width: 2),
-                                borderRadius: BorderRadius.circular(4),
+                        : someClients && clients.length != 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0, top: 40.0),
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey, width: 2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: new DropdownButton(
+                                      value: clientValue,
+                                      hint: Text("Seleccionar cliente"),
+                                      dropdownColor: Color(0xffff7f7f7),
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconSize: 36,
+                                      isExpanded: true,
+                                      underline: SizedBox(),
+                                      items: clients.map((cliente) {
+                                        return new DropdownMenuItem(
+                                            child: new Text(
+                                                cliente.nombre != null
+                                                    ? cliente.nombre
+                                                    : "N/A"),
+                                            value: cliente.cliente);
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        clientSelected = true;
+                                        saveClient(val);
+                                        loadContracts(val);
+                                        setState(() {
+                                          clientValue = val;
+                                        });
+                                      }),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text(
+                                    uniqueClient != "" ? uniqueClient : "N/A",
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
-                              child: new DropdownButton(
-                                  value: contractValue,
-                                  hint: Text("Seleccionar contrato"),
-                                  dropdownColor: Color(0xffff7f7f7),
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  iconSize: 36,
-                                  isExpanded: true,
-                                  underline: SizedBox(),
-                                  items: contracts.map((contract) {
-                                    return new DropdownMenuItem(
-                                        child: new Text(
-                                            contract.noContrato != null
+                    isLoadContractSelect
+                        ? someClients && !lContracts
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text("Seleccione a un cliente..."),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+                        : someContracts && contracts.length != 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0, right: 16.0, top: 40.0),
+                                child: Container(
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey, width: 2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: new DropdownButton(
+                                      value: contractValue,
+                                      hint: Text("Seleccionar contrato"),
+                                      dropdownColor: Color(0xffff7f7f7),
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      iconSize: 36,
+                                      isExpanded: true,
+                                      underline: SizedBox(),
+                                      items: contracts.map((contract) {
+                                        return new DropdownMenuItem(
+                                            child: new Text(contract
+                                                        .noContrato !=
+                                                    null
                                                 ? "No. ${contract.noContrato}"
                                                 : "N/A"),
-                                        value: contract.correlativoContrato);
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    saveContract(val);
-                                    loadBills(val);
-                                    setState(() {
-                                      contractValue = val;
-                                    });
-                                  }),
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.only(
-                                left: 16.0,
-                                right: 16.0,
-                                top: 40.0,
-                                bottom: 20.00),
-                            child: Center(
-                              child: Text(
-                                uniqueContract != ""
-                                    ? uniqueContract
-                                    : "Contrato no encontrado",
-                                style: TextStyle(fontSize: 18),
-                                textAlign: TextAlign.center,
+                                            value:
+                                                contract.correlativoContrato);
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        saveContract(val);
+                                        loadBills(val);
+                                        setState(() {
+                                          contractValue = val;
+                                        });
+                                      }),
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text(
+                                    uniqueContract != ""
+                                        ? uniqueContract
+                                        : "Contrato no encontrado",
+                                    style: TextStyle(fontSize: 18),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                Flexible(
-                  child: isLoadBills
-                      ? someContracts && !lBills
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16.0,
-                                  right: 16.0,
-                                  top: 40.0,
-                                  bottom: 20.00),
-                              child: Center(
-                                child: Text("Seleccione a un contrato..."),
-                              ),
-                            )
-                          : lContracts || !clientSelected
-                              ? Center()
-                              : Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                      : bills.length == 0
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16.0,
-                                  right: 16.0,
-                                  top: 40.0,
-                                  bottom: 20.00),
-                              child: Center(
-                                child: Text(
-                                    "No hay facturas relacionadas a este contrato"),
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: bills.length,
-                              itemBuilder: (context, index) {
-                                return CardOptions(
-                                  title: bills[index].despliegue,
-                                  route: SmallTaxpayerBill(),
-                                  codeTypeBill: bills[index].documentoTipo
-                                );
-                              }),
+                    isLoadBills
+                        ? someContracts && !lBills
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text("Seleccione a un contrato..."),
+                                ),
+                              )
+                            : lContracts || !clientSelected
+                                ? Center()
+                                : Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                        : bills.length == 0
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16.0,
+                                    right: 16.0,
+                                    top: 40.0,
+                                    bottom: 20.00),
+                                child: Center(
+                                  child: Text(
+                                      "No hay facturas relacionadas a este contrato"),
+                                ),
+                              )
+                            : Column(
+                                children: new List.generate(
+                                    bills.length,
+                                    (index) => CardOptions(
+                                        title: bills[index].despliegue,
+                                        route: SmallTaxpayerBill(),
+                                        codeTypeBill:
+                                            bills[index].documentoTipo))),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   loadClients() async {
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
@@ -298,8 +307,8 @@ class _OptionsUserState extends State<OptionsUser> {
   saveClient(client) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString("client", client);
-    for(var c in clients){
-      if(client == c.cliente){
+    for (var c in clients) {
+      if (client == c.cliente) {
         sharedPreferences.setString("clientName", c.nombre);
       }
     }
@@ -311,7 +320,7 @@ class _OptionsUserState extends State<OptionsUser> {
       lContracts = true;
       isLoadBills = true;
     });
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
@@ -380,15 +389,15 @@ class _OptionsUserState extends State<OptionsUser> {
 
   saveContract(contract) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    for(var con in contracts){
-      if(con.correlativoContrato == contract){
+    for (var con in contracts) {
+      if (con.correlativoContrato == contract) {
         sharedPreferences.setString("startDateContract", con.fechaInicio);
         sharedPreferences.setString("endDateContract", con.fechaFinalizacion);
-        if(con.finalizado == "1"){
+        if (con.finalizado == "1") {
           sharedPreferences.setString("finishContract", "Si");
-        }else{
+        } else {
           sharedPreferences.setString("finishContract", "No");
-        }  
+        }
       }
     }
     sharedPreferences.setString("contract", contract);
@@ -400,7 +409,7 @@ class _OptionsUserState extends State<OptionsUser> {
       bills = [];
       isLoadBills = true;
     });
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");

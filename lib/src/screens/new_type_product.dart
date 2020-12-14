@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tekra_app/src/global/global.dart';
-import 'package:tekra_app/src/models/cliente.dart';
 import 'package:tekra_app/src/screens/components/rounded_button.dart';
 
 import 'package:http/http.dart' as http;
@@ -25,12 +24,7 @@ class _NewTypeProduct extends State<NewTypeProduct> {
   List<String> typeProductList = ["Bien", "Servicio"];
 
   //Variables necesarias para los objetos relacionados a cliente:
-  static List<Client> clientList;
-  String uniqueClient = "";
-  bool someClients = false;
-  String clientValue;
-  bool isLoadClientSelect = true;
-  bool clientSelected = false;
+  String clientSelected = "";
 
   @override
   initState() {
@@ -46,9 +40,9 @@ class _NewTypeProduct extends State<NewTypeProduct> {
       backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+          margin: EdgeInsets.symmetric(vertical: 0, horizontal: 15),
           width: size.width * 0.9,
-          child: Column(
+          child: ListView(
             children: <Widget>[
               SizedBox(
                 height: 30,
@@ -57,7 +51,8 @@ class _NewTypeProduct extends State<NewTypeProduct> {
                 alignment: Alignment.centerLeft,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pop();
+                    Navigator.pushReplacementNamed(
+                        context, "/manage_type_products");
                   },
                   child: Icon(Icons.close),
                 ),
@@ -86,6 +81,23 @@ class _NewTypeProduct extends State<NewTypeProduct> {
                   color: Color(0xfff4fbfe),
                   child: Column(
                     children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        margin:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 22),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Cliente: $clientSelected",
+                            style: TextStyle(fontSize: 17),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       RoundedInputField(
                         text: "Descripción",
                         onChanged: (val) {},
@@ -114,134 +126,48 @@ class _NewTypeProduct extends State<NewTypeProduct> {
                             SizedBox(
                               height: 10,
                             ),
-                            DropdownButtonFormField(
-                              validator: (value) =>
-                                  value == null ? 'Dato obligatorio' : null,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                    borderSide: BorderSide(
-                                        color: Colors.white, width: 2)),
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                    borderSide: BorderSide(
-                                        color: Color(0xffa8e1f5), width: 2)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(4),
-                                    borderSide: BorderSide(
-                                        color: Color(0xffa8e1f5), width: 2)),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(5)),
+                              child: DropdownButtonFormField(
+                                validator: (value) =>
+                                    value == null ? 'Dato obligatorio' : null,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Colors.white, width: 2)),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                      borderSide: BorderSide(
+                                          color: Color(0xffa8e1f5), width: 2)),
+                                ),
+                                hint: Text("Bien o servicio"),
+                                dropdownColor: Colors.white,
+                                elevation: 5,
+                                icon: Icon(Icons.arrow_drop_down),
+                                isExpanded: true,
+                                value: typeProductValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    typeProductValue = value;
+                                  });
+                                },
+                                items: typeProductList.map((tyeProduct) {
+                                  return DropdownMenuItem(
+                                      value: tyeProduct,
+                                      child: Text(tyeProduct));
+                                }).toList(),
                               ),
-                              hint: Text("Bien o servicio"),
-                              dropdownColor: Colors.white,
-                              elevation: 5,
-                              icon: Icon(Icons.arrow_drop_down),
-                              isExpanded: true,
-                              value: typeProductValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  typeProductValue = value;
-                                });
-                              },
-                              items: typeProductList.map((tyeProduct) {
-                                return DropdownMenuItem(
-                                    value: tyeProduct, child: Text(tyeProduct));
-                              }).toList(),
                             ),
                           ],
                         ),
                       ),
-                      isLoadClientSelect
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16.0,
-                                  right: 16.0,
-                                  top: 40.0,
-                                  bottom: 20.00),
-                              child: Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            )
-                          : someClients && clientList.length != 0
-                              ? Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 20),
-                                  width: size.width * 0.75,
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          "Cliente",
-                                          style: TextStyle(
-                                              color: Color(0xff051228),
-                                              fontSize: 15.00),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      DropdownButtonFormField(
-                                        validator: (value) => value == null
-                                            ? 'Dato obligatorio'
-                                            : null,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              borderSide: BorderSide(
-                                                  color: Colors.white,
-                                                  width: 2)),
-                                          enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              borderSide: BorderSide(
-                                                  color: Color(0xffa8e1f5),
-                                                  width: 2)),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                              borderSide: BorderSide(
-                                                  color: Color(0xffa8e1f5),
-                                                  width: 2)),
-                                        ),
-                                        hint: Text("Cliente"),
-                                        dropdownColor: Colors.white,
-                                        elevation: 5,
-                                        icon: Icon(Icons.arrow_drop_down),
-                                        isExpanded: true,
-                                        value: clientValue,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            print(value);
-                                            clientValue = value;
-                                          });
-                                        },
-                                        items: clientList.map((client) {
-                                          return DropdownMenuItem(
-                                              child: new Text(
-                                                  client.nombre != null
-                                                      ? client.nombre
-                                                      : "N/A"),
-                                              value: client.cliente);
-                                        }).toList(),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 16.0,
-                                      right: 16.0,
-                                      top: 40.0,
-                                      bottom: 20.00),
-                                  child: Center(
-                                    child: Text(
-                                      uniqueClient != "" ? uniqueClient : "N/A",
-                                      style: TextStyle(fontSize: 18),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
                       SizedBox(
                         height: 10,
                       ),
@@ -280,88 +206,31 @@ class _NewTypeProduct extends State<NewTypeProduct> {
   }
 
   loadData() async {
-    ProgressDialog progressDialog = ProgressDialog(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    var pnUsuario = sharedPreferences.get("user");
-    var pnClave = sharedPreferences.get("pass");
-    Map json = {
-      'autenticacion': {'pn_usuario': pnUsuario, 'pn_clave': pnClave},
-      'parametros': {'pn_usuario': pnUsuario, 'pn_estado': "1"}
-    };
-    var jsonData;
-
-    var body = convert.jsonEncode(json);
-    var response = await http.post(
-        gFunct.globalURL + "administracion/usuarios/usuario_clientes_listado",
-        headers: {"Content-Type": "application/json"},
-        body: body);
-    if (response.statusCode == 200) {
-      progressDialog.show();
-      jsonData = convert.jsonDecode(response.body);
-      if (jsonData['resultado'][0]['error'] == 0) {
-        List<Client> _clients = [];
-        var datos = jsonData['datos'];
-        for (var d in datos) {
-          _clients.add(Client.fromJson(d));
-        }
-        print(_clients);
-        //Verifica si el usuario tienen uno cliente asignado o más para mostrar el select correspondiente.
-        print("HOLA");
-        if (_clients.length == 1) {
-          setState(() {
-            print("HOLA");
-            clientList = _clients;
-            uniqueClient = "Client: ${_clients[0].nombre}";
-            someClients = false;
-            isLoadClientSelect = false;
-            progressDialog.dismiss();
-            clientSelected = true;
-          });
-        } else {
-          setState(() {
-            print("HOLA");
-            uniqueClient = "";
-            clientList = _clients;
-            isLoadClientSelect = false;
-            someClients = true;
-            progressDialog.dismiss();
-          });
-        }
-      } else {
-        gFunct.showModalDialog(
-            "Error al obtener información",
-            "Hubo un error al solicitar sus opciones, intentelo en unos minutos",
-            context);
-        progressDialog.dismiss();
-      }
-    } else {
-      gFunct.showModalDialog(
-          "Error en el servidor",
-          "Se generó un error en el servidor, intetelo en unos minutos",
-          context);
-      progressDialog.dismiss();
-    }
+    setState(() {
+      clientSelected = sharedPreferences.get("clientNameTypeProductNew");
+    });
   }
 
   saveInfo() async {
     if (formKey.currentState.validate()) {
-      ProgressDialog progressDialog = ProgressDialog(context);
+      ProgressDialog2 progressDialog = ProgressDialog2(context);
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var pnUsuario = sharedPreferences.get("user");
       var pnClave = sharedPreferences.get("pass");
+      var pnClient = sharedPreferences.get("clientTypeProductNew");
       var tipo = 0;
       if (typeProductValue == "Bien") {
         tipo = 1;
       } else {
         tipo = 0;
       }
-      print(clientValue);
       Map json = {
         "autenticacion": {"pn_usuario": pnUsuario, "pn_clave": pnClave},
         "parametros": {
           "pn_empresa": 1,
-          "pn_cliente": clientValue,
+          "pn_cliente": pnClient,
           "pn_accion": "A",
           "pn_producto_tipo": "",
           "pn_descripcion": descriptionController.text,
@@ -371,17 +240,16 @@ class _NewTypeProduct extends State<NewTypeProduct> {
       };
       var jsonData;
       var body = convert.jsonEncode(json);
-      print(body);
       var response = await http.post(
-          gFunct.globalURL + "certificaciones/catalogos/cliente_tipos_producto_gestion",
+          gFunct.globalURL +
+              "certificaciones/catalogos/cliente_tipos_producto_gestion",
           headers: {"Content-Type": "application/json"},
           body: body);
-      if (response.statusCode == 200) { 
+      if (response.statusCode == 200) {
         progressDialog.show();
         jsonData = convert.jsonDecode(response.body);
         if (jsonData['resultado'][0]['error'] == 0) {
           progressDialog.dismiss();
-          print("Sin error");
           gFunct.showModalDialog(
               "Registro exitoso",
               "El tipo de producto ingresado fue ingresado con éxito.",

@@ -18,7 +18,7 @@ import 'dart:convert' as convert;
 import 'package:tekra_app/src/utils/dialog.dart';
 
 // ignore: must_be_immutable
-class Login extends StatefulWidget{
+class Login extends StatefulWidget {
   //Url para poder acceder a esta clase
   static const String routeName = "/login";
 
@@ -29,17 +29,17 @@ class Login extends StatefulWidget{
 class _LoginState extends State<Login> with ValidationMixins {
   TextEditingController userController = TextEditingController();
   TextEditingController contrasenaController = TextEditingController();
-  final GlobalKey<FormState> formKey= new GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
   GlobalFunctions global = GlobalFunctions();
 
   String mensaje = "";
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Color(0xfff4fbfe),
-      body:Form(
+      body: Form(
         key: formKey,
         child: Container(
           width: double.infinity,
@@ -48,23 +48,36 @@ class _LoginState extends State<Login> with ValidationMixins {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                height: 56,
+                height: 70,
               ),
               Image.asset(
                 'assets/images/logo/logo3x-black.png',
                 fit: BoxFit.none,
-                scale: 2,
+                scale: 3,
               ),
               Spacer(),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                width: size.width * 0.75,
+                child: Text(
+                  mensaje,
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
               RoundedInputField(
                 text: "Usuario",
-                onChanged: (value){
-                },
+                onChanged: (value) {},
                 validator: validateUsuario,
                 controller: userController,
               ),
               RoundedPasswordField(
-                onChanged: (value){},
+                onChanged: (value) {},
                 validator: validateContrasena,
                 controller: contrasenaController,
                 pass: false,
@@ -72,29 +85,25 @@ class _LoginState extends State<Login> with ValidationMixins {
               SizedBox(
                 height: 10,
               ),
-              Text(
-                mensaje,
-                style: TextStyle(
-                  color: Colors.redAccent,
-                  fontSize: 15,
-                ),
-              )
-              ,
               Spacer(),
               MessageContextText(
                 text: "¿Olvidaste tu contraseña?",
                 textaction: "Recuperar contraseña",
                 size: size,
-                ontap: (){},
+                ontap: () {
+                  global.showModalDialog("Opción no disponible.",
+                      "Opción actualmente no disponible", context);
+                },
               ),
               SizedBox(
                 height: 20,
               ),
               RoudedButton(
                 text: "INICIAR SESIÓN",
-                press: (){
-                  if(formKey.currentState.validate()){
-                    _login(this.context, userController.text, contrasenaController.text);
+                press: () {
+                  if (formKey.currentState.validate()) {
+                    _login(this.context, userController.text,
+                        contrasenaController.text);
                   }
                 },
                 color: Color(0xff26b5e6),
@@ -106,32 +115,33 @@ class _LoginState extends State<Login> with ValidationMixins {
             ],
           ),
         ),
-      ),  
+      ),
     );
   }
 
-  _login(context, String user, String pass) async{
-    ProgressDialog progressDialog = ProgressDialog(context);
+  _login(context, String user, String pass) async {
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     progressDialog.show();
     var result = await Connectivity().checkConnectivity();
-    if(result == ConnectivityResult.none){
+    if (result == ConnectivityResult.none) {
       progressDialog.dismiss();
-      global.showModalDialog("Conexión no encontrada", "Actualmente no tienes acceso a Internet.", context);
-    }else{
-      String pnClave = "";     
+      global.showModalDialog("Conexión no encontrada",
+          "Actualmente no tienes acceso a Internet.", context);
+    } else {
+      String pnClave = "";
       FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
       _firebaseMessaging.requestNotificationPermissions();
       final token = await _firebaseMessaging.getToken();
-      if(Platform.isAndroid){
+      if (Platform.isAndroid) {
         pnClave = "ADR";
-      }else if(Platform.isIOS){
+      } else if (Platform.isIOS) {
         pnClave = "IOS";
       }
-      Clipboard.setData(ClipboardData(text:token));
+      Clipboard.setData(ClipboardData(text: token));
       Map data = {
-        'parametros':{
-          'pn_usuario':user,
-          'pn_clave':pass,
+        'parametros': {
+          'pn_usuario': user,
+          'pn_clave': pass,
           'pn_origen': pnClave,
           'pn_identificador': token
         }
@@ -139,31 +149,45 @@ class _LoginState extends State<Login> with ValidationMixins {
       print(token);
       var body = convert.jsonEncode(data);
       var jsonData;
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      var response = await http.post("http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/administracion/login/usuarios_login", headers: {"Content-Type": "application/json"}, body: body);
-      if(response.statusCode == 200){
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      var response = await http.post(
+          "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/administracion/login/usuarios_login",
+          headers: {"Content-Type": "application/json"},
+          body: body);
+      if (response.statusCode == 200) {
         jsonData = json.decode(response.body);
-        if(jsonData['resultado'][0]['error'] == 0){
-          if(jsonData['datos'][0]['clave_vencida']==1){
+        if (jsonData['resultado'][0]['error'] == 0) {
+          if (jsonData['datos'][0]['clave_vencida'] == 1) {
             progressDialog.dismiss();
-            global.showDialogWithNav("Clave vencida", "Tu clave ha expirado, vuelve a solicitar una clave", "/expired_key", context);
-          }else{
+            global.showDialogWithNav(
+                "Clave vencida",
+                "Tu clave ha expirado, vuelve a solicitar una clave",
+                "/expired_key",
+                context);
+          } else {
             progressDialog.dismiss();
-            sharedPreferences.setString("user", jsonData['datos'][0]['usuario']);
-            sharedPreferences.setString("user_name", jsonData['datos'][0]['nombre_usuario']);
+            sharedPreferences.setString(
+                "user", jsonData['datos'][0]['usuario']);
+            sharedPreferences.setString(
+                "user_name", jsonData['datos'][0]['nombre_usuario']);
             sharedPreferences.setString("pass", pass);
             Navigator.pushReplacementNamed(context, "/two_step_verification");
           }
-        }else{
+        } else {
           progressDialog.dismiss();
-          mensaje = jsonData['resultado'][0]['mensaje'];
+          setState(() {
+            mensaje =
+                "Usuario y/o Clave incorrectos. Verifique las credenciales de nuevo.";
+          });
         }
-      }else if(response.statusCode == 500){
+      } else if (response.statusCode == 500) {
         progressDialog.dismiss();
-        global.showModalDialog("Error en el servidor", "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.", context);
+        global.showModalDialog(
+            "Error en el servidor",
+            "Se generó un error al intentar conectarse al servidor, intentelo de nuevo o espere un momento.",
+            context);
       }
     }
   }
 }
-
-

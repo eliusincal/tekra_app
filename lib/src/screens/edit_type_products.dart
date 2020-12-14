@@ -280,7 +280,7 @@ class _EditTypeProduct extends State<EditTypeProduct> {
   }
 
   loadData() async {
-    ProgressDialog progressDialog = ProgressDialog(context);
+    ProgressDialog2 progressDialog = ProgressDialog2(context);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
@@ -359,7 +359,7 @@ class _EditTypeProduct extends State<EditTypeProduct> {
 
   saveInfo() async {
     if (formKey.currentState.validate()) {
-      ProgressDialog progressDialog = ProgressDialog(context);
+      ProgressDialog2 progressDialog = ProgressDialog2(context);
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       var pnUsuario = sharedPreferences.get("user");

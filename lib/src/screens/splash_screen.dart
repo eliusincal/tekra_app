@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tekra_app/src/provider/notifications.dart';
 
@@ -36,6 +37,7 @@ class _SplashScreen extends State<SplashScreen>{
 
   @override
   Widget build(BuildContext context){
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     return Scaffold(
       backgroundColor: Color(0xff26b5e6),
       body:SafeArea(

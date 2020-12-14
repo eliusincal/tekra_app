@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_ip/get_ip.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tekra_app/src/global/global.dart';
-import 'package:tekra_app/src/models/coin.dart';
 import 'package:tekra_app/src/models/detail_invoice.dart';
-import 'package:tekra_app/src/models/establishment.dart';
 import 'package:tekra_app/src/screens/components/rounded_button.dart';
 
 import 'package:http/http.dart' as http;
@@ -20,18 +19,8 @@ class ResumeInvoice extends StatefulWidget {
 
 class _ResumeInvoiceState extends State<ResumeInvoice> {
   GlobalFunctions gFunct = GlobalFunctions();
-  TextEditingController userController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
-  //Formulario para poder generar las validaciones
-  final GlobalKey<FormState> formKey = new GlobalKey<FormState>();
-  final establecientoSeleccionado = TextEditingController();
-  //Valores para el dropdown de Establecimiento
-  String establishmentValue;
-  //Valores para el dropdown de Modena
-  String coinVal;
-  bool exchangeRateIsLocked = true;
-  TextEditingController exchangeRateController = TextEditingController();
 
+  //Datos para el resumen de información parte 1
   String invoiceTitle = "N/A";
   String finished = "N/A";
   String transmitter = "N/A";
@@ -39,8 +28,19 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
   String startDate = "0000-00-00";
   String endDate = "0000-00-00";
 
-  List<Coin> coinList = [];
-  List<Establishment> establishmentList = [];
+  //Datos para el resumen de información parte 2
+  String dateIssue = "0000-00-00";
+  String coin = "N/A";
+  String typeDocument = "N/A";
+
+  //Datos para el resumen de información parte 3
+  String nit = "0";
+  String name = "N/A";
+  String address = "N/A";
+
+  //Datos para el resumen de información parte 4
+  String items = "0";
+  String total = "0.00";
 
   @override
   initState() {
@@ -60,49 +60,50 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
           width: size.width * 0.9,
           child: Column(
             children: [
+              // SizedBox(
+              //   height: 30,
+              // ),
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: GestureDetector(
+              //     onTap: () {
+              //       Navigator.pop(context);
+              //     },
+              //     child: Icon(Icons.close),
+              //   ),
+              // ),
               SizedBox(
-                height: 30,
+                height: 40,
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(Icons.close),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  invoiceTitle,
-                  style: TextStyle(
-                    color: Color(0xff051228),
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Resumen",
-                style: TextStyle(
-                  color: Color(0xff26b5e6),
-                  fontSize: 15,
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+
               Flexible(
                 child: ListView(
                   padding: const EdgeInsets.all(8),
                   children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        invoiceTitle,
+                        style: TextStyle(
+                          color: Color(0xff051228),
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Resumen",
+                      style: TextStyle(
+                        color: Color(0xff26b5e6),
+                        fontSize: 15,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     CardInfo(
                       size: size,
                       transmitter: transmitter,
@@ -114,11 +115,272 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
                     SizedBox(
                       height: 10,
                     ),
-                    CardInfoDescription(size: size),
+                    CardInfoDescription(
+                      size: size,
+                      date: dateIssue,
+                      coin: coin,
+                      typeDocument: typeDocument,
+                    ),
                     SizedBox(
                       height: 10,
                     ),
-                    CardInfoClient(size: size)
+                    CardInfoClient(
+                      size: size,
+                      nit: nit,
+                      name: name,
+                      address: address,
+                    ),
+                    CardInfoTotals(
+                      size: size,
+                      totalItems: items,
+                      totalInvoice: total,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      color: Color(0xfff7f7f7),
+                      child: Column(
+                        children: <Widget>[
+                          ExpansionTile(
+                            title: Text(
+                              "Items",
+                              style: TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.bold),
+                            ),
+                            children: new List.generate(
+                                widget.detailBills.length,
+                                (index) => Card(
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      color: Color(0xfff4fbfe),
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 20),
+                                          width: size.width * 0.8,
+                                          child: Column(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  "Item: ${index + 1}",
+                                                  style:
+                                                      TextStyle(fontSize: 20),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            "Cantidad",
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff69717e),
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            widget
+                                                                .detailBills[
+                                                                    index]
+                                                                .cantidad,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            "Producto/Servicio",
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff69717e),
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            widget
+                                                                .detailBills[
+                                                                    index]
+                                                                .bienServicio,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            "Valor unitario",
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff69717e),
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            widget
+                                                                .detailBills[
+                                                                    index]
+                                                                .valorUnitario,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            "Descuento unitario",
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff69717e),
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            widget
+                                                                .detailBills[
+                                                                    index]
+                                                                .descuentoUnitario,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            "Descripción",
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff69717e),
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .centerLeft,
+                                                          child: Text(
+                                                            widget
+                                                                .detailBills[
+                                                                    index]
+                                                                .descripcion,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xff051228),
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          )),
+                                    )),
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -169,9 +431,44 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
     );
   }
 
+  loadData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      invoiceTitle = sharedPreferences.get("invoiceTitle");
+      transmitter = sharedPreferences.get("clientName");
+      contractNumber = sharedPreferences.get("contract");
+      if (sharedPreferences.get("startDateContract") != null) {
+        startDate = sharedPreferences
+            .get("startDateContract")
+            .toString()
+            .substring(0, 10);
+      }
+      if (sharedPreferences.get("endDateContract") != null) {
+        endDate = sharedPreferences
+            .get("endDateContract")
+            .toString()
+            .substring(0, 10);
+      }
+      finished = sharedPreferences.get("finishContract");
+      dateIssue = sharedPreferences
+          .get("dateGeneratedInvoice")
+          .toString()
+          .substring(0, 10);
+      coin = sharedPreferences.get("coin");
+      nit = sharedPreferences.get("nitInvoice");
+      name = sharedPreferences.get("nameInvoice");
+      address = sharedPreferences.get("addressInvoice");
+      items = sharedPreferences.get("totalItems");
+      total = sharedPreferences.get("totalInvoice");
+    });
+  }
+
   saveInfo() async {
     // Web service para poder generar el documento
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    ProgressDialog pr = ProgressDialog(context);
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     var pnUsuario = sharedPreferences.get("user");
     var pnClave = sharedPreferences.get("pass");
     var pnCliente = sharedPreferences.get("client");
@@ -185,7 +482,20 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
     var pnEmail = sharedPreferences.get("emailInvoice");
     var pnCoin = sharedPreferences.get("coin");
     var pnExchangeRate = sharedPreferences.get("exchangeRate");
-
+    pr.style(
+        message: '1/5. Creando documento',
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: CircularProgressIndicator(),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        progress: 0.0,
+        maxProgress: 100.0,
+        progressTextStyle: TextStyle(
+            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600));
+    await pr.show();
     Map data = {
       "autenticacion": {"pn_usuario": pnUsuario, "pn_clave": pnClave},
       "parametros": {
@@ -207,7 +517,6 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
     };
 
     var body = convert.jsonEncode(data);
-    print(body);
     var jsonData;
     var response = await http.post(
         "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/clientes/cliente_documentos_gestion",
@@ -217,6 +526,7 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
     if (response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       if (jsonData['resultado'][0]['error'] == 0) {
+        pr.update(message: "2/5. Adjuntando detalles del documento");
         var documento = jsonData["resultado"][0]["documento"];
         //Web service para poder adjutarle los detalles de documento al documento ;)
         for (var di in widget.detailBills) {
@@ -241,13 +551,10 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
             }
           };
           var body = convert.jsonEncode(data);
-          print("detalle de documento");
-          print(body);
           response = await http.post(
               "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/clientes/cliente_documento_detalle_gestion",
               headers: {"Content-Type": "application/json"},
               body: body);
-          print(convert.jsonDecode(response.body));
           if (response.statusCode == 200) {
             print("success send detail invoice ;)");
           } else {
@@ -259,7 +566,9 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
         }
 
         //Web service para poder obtener el xml a firmar ;)
+        pr.update(message: "3/5. Recopilando información");
         var xmlFirmar = "";
+        var pnEstado = "";
         var pnUsuario = sharedPreferences.get("user");
         var pnClave = sharedPreferences.get("pass");
         var pnCliente = sharedPreferences.get("client");
@@ -285,9 +594,8 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
           }
         };
 
+        pr.update(message: "4/5. Firmando el documento");
         var body = convert.jsonEncode(data);
-        print("Obtiene el documento para firmar");
-        print(body);
         response = await http.post(
             "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/clientes/cliente_documentos_listado",
             headers: {"Content-Type": "application/json"},
@@ -297,6 +605,7 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
           jsonData = convert.jsonDecode(response.body);
           if (jsonData['resultado'][0]['error'] == 0) {
             xmlFirmar = jsonData['datos'][0]['xml_a_firmar'];
+            pnEstado = jsonData['datos'][0]['estado'].toString();
           }
         }
 
@@ -326,7 +635,50 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
             "http://apicertificacion.desa.tekra.com.gt:8080/certificacion/servicio.php",
             headers: {"Content-Type": "text/xml"},
             body: bodySoap);
-        print(response.body);
+        if (response.statusCode == 200) {
+          //Web service para completar el ciclo
+          var pnUsuario = sharedPreferences.get("user");
+          var pnClave = sharedPreferences.get("pass");
+          var pnCliente = sharedPreferences.get("client");
+          var pnContrato = sharedPreferences.get("contract");
+          Map data = {
+            "autenticacion": {"pn_usuario": pnUsuario, "pn_clave": pnClave},
+            "parametros": {
+              "pn_empresa": "1",
+              "pn_cliente": pnCliente,
+              "pn_contrato": pnContrato,
+              "pn_documento": documento,
+              "pn_estado": pnEstado,
+              "pn_observaciones": "",
+              "pn_uuid": "",
+              "pn_serie": "",
+              "pn_numero_documento": ""
+            }
+          };
+
+          var body = convert.jsonEncode(data);
+
+          pr.update(message: "5/5. Finalizando documento");
+          response = await http.post(
+              "http://apiseguimiento.desa.tekra.com.gt:8080/seguimiento/certificaciones/clientes/cliente_documento_estado_gestion",
+              headers: {"Content-Type": "application/json"},
+              body: body);
+
+          if (response.statusCode == 200) {
+            await pr.hide();
+            jsonData = convert.jsonDecode(response.body);
+            if (jsonData['resultado'][0]['error'] == 0) {
+              var urlrg = jsonData['resultado'][0]['url_rg'];
+              sharedPreferences.setString("url_documento", urlrg);
+              sharedPreferences.setString("no_documento", documento.toString());
+              gFunct.showDialogWithNav(
+                  "Documento generado correctamente",
+                  "El documento se generó sin problemas",
+                  "/result_document",
+                  context);
+            }
+          }
+        }
       } else {
         gFunct.showModalDialog(
             "Error al obtener información",
@@ -342,43 +694,19 @@ class _ResumeInvoiceState extends State<ResumeInvoice> {
   }
 }
 
-loadData() async {
-  // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  // var title = "N/A";
-  // var finish = "N/A";
-  // var transm = "N/A";
-  // var contractNum = "N/A";
-  // var eDate = "0000-00-00";
-  // var sDate = "0000-00-00";
-  // if (sharedPreferences.get("invoiceTitle") != null) {
-  //   title = sharedPreferences.get("invoiceTitle");
-  // }
-  // if (sharedPreferences.get("startDateContract") != null) {
-  //   sDate =
-  //       sharedPreferences.get("startDateContract").toString().substring(0, 10);
-  // }
-  // if (sharedPreferences.get("endDateContract") != null) {
-  //   eDate =
-  //       sharedPreferences.get("endDateContract").toString().substring(0, 10);
-  // }
-  // if (sharedPreferences.get("finishContract") != null) {
-  //   finish = sharedPreferences.get("finishContract");
-  // }
-  // if (sharedPreferences.get("contract") != null) {
-  //   contractNum = sharedPreferences.get("contract");
-  // }
-  // if (sharedPreferences.get("clientName") != null) {
-  //   transm = sharedPreferences.get("clientName");
-  // }
-}
-
 class CardInfoClient extends StatelessWidget {
   const CardInfoClient({
     Key key,
+    this.nit,
+    this.name,
+    this.address,
     @required this.size,
   }) : super(key: key);
 
   final Size size;
+  final nit;
+  final name;
+  final address;
 
   @override
   Widget build(BuildContext context) {
@@ -411,7 +739,7 @@ class CardInfoClient extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "1234567-8",
+                    nit,
                     style: TextStyle(
                       color: Color(0xffffffff),
                       fontSize: 19,
@@ -434,7 +762,7 @@ class CardInfoClient extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "SERVICIOS Y CONSULTAS, S.A.",
+                    name,
                     style: TextStyle(
                       color: Color(0xffffffff),
                       fontSize: 19,
@@ -457,7 +785,7 @@ class CardInfoClient extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "GUATEMALA, GUATEMALA",
+                    address,
                     style: TextStyle(
                       color: Color(0xffffffff),
                       fontSize: 19,
@@ -471,14 +799,90 @@ class CardInfoClient extends StatelessWidget {
   }
 }
 
-class CardInfoDescription extends StatelessWidget {
-  const CardInfoDescription({
+class CardInfoTotals extends StatelessWidget {
+  const CardInfoTotals({
     Key key,
-    @required this.size, //this.date
+    this.totalItems,
+    this.totalInvoice,
+    @required this.size,
   }) : super(key: key);
 
   final Size size;
-  //final date;
+  final totalItems;
+  final totalInvoice;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        color: Color(0xfff051228),
+        child: Container(
+            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            width: size.width * 0.8,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Totales",
+                    style: TextStyle(
+                      color: Color(0xffffffff),
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "$totalItems Items",
+                        style: TextStyle(
+                          color: Color(0xffffffff),
+                          fontSize: 17,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "GTQ $totalInvoice",
+                        style: TextStyle(
+                          color: Color(0xffffffff),
+                          fontSize: 17,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )),
+      ),
+    );
+  }
+}
+
+class CardInfoDescription extends StatelessWidget {
+  const CardInfoDescription(
+      {Key key, @required this.size, this.date, this.coin, this.typeDocument})
+      : super(key: key);
+
+  final Size size;
+  final date;
+  final coin;
+  final typeDocument;
 
   @override
   Widget build(BuildContext context) {
@@ -496,56 +900,53 @@ class CardInfoDescription extends StatelessWidget {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          children: [
-                            Text(
-                              "Fecha",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xff69717e),
-                              ),
-                              textAlign: TextAlign.start,
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          Text(
+                            "Fecha",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xff69717e),
                             ),
-                            Text(
-                              "10",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xff69717e),
-                              ),
-                              textAlign: TextAlign.start,
+                            textAlign: TextAlign.start,
+                          ),
+                          Text(
+                            date,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color(0xff69717e),
                             ),
-                          ],
-                        ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          children: [
-                            Text(
-                              "Moneda",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xff69717e),
-                              ),
-                              textAlign: TextAlign.start,
+                    Spacer(),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          Text(
+                            "Moneda",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xff69717e),
                             ),
-                            Text(
-                              "GTQ - Quetzal",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xff69717e),
-                              ),
-                              textAlign: TextAlign.start,
+                            textAlign: TextAlign.start,
+                          ),
+                          Text(
+                            coin,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color(0xff69717e),
                             ),
-                          ],
-                        ),
+                            textAlign: TextAlign.start,
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -566,53 +967,7 @@ class CardInfoDescription extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Factura Pequeño Contribuyente",
-                    style: TextStyle(
-                      color: Color(0xff555555),
-                      fontSize: 19,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "No. de documento",
-                    style: TextStyle(
-                      color: Color(0xffbbbbbb),
-                      fontSize: 17,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "203418745109",
-                    style: TextStyle(
-                      color: Color(0xff555555),
-                      fontSize: 19,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Estado",
-                    style: TextStyle(
-                      color: Color(0xffbbbbbb),
-                      fontSize: 17,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Ingresado",
+                    typeDocument,
                     style: TextStyle(
                       color: Color(0xff555555),
                       fontSize: 19,
@@ -719,6 +1074,9 @@ class CardInfo extends StatelessWidget {
                       fontSize: 19,
                     ),
                   ),
+                ),
+                SizedBox(
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -5,7 +5,8 @@ class DetailInvoice {
       descuentoUnitario,
       descripcion,
       identificador,
-      tipoProducto;
+      tipoProducto,
+      bienServicio;
   DetailInvoice(
       this.cantidad,
       this.producto,
@@ -13,7 +14,8 @@ class DetailInvoice {
       this.descuentoUnitario,
       this.descripcion,
       this.identificador,
-      this.tipoProducto);
+      this.tipoProducto,
+      this.bienServicio);
 
   DetailInvoice.fromJson(Map<String, dynamic> json)
       : cantidad = json["cantidad"].toString(),
